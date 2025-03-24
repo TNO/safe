@@ -1,0 +1,23 @@
+{
+  "name": "compass",
+  "version": "0.0.1",
+  "private": "true",
+  "description": "Tool voor de evaluatie van het gedrag van bewoners van COA centra.",
+  "scripts": {
+    "clean": "pnpm --parallel run clean",
+    "start": "pnpm --parallel run dev",
+    "build": "pnpm recursive run build"
+  },
+  "keywords": [
+    "mithril",
+    "materialize-css",
+    "typescript"
+  ],
+  "author": "Erik Vullings <erik.vullings@tno.nl> (http://www.tno.nl)",
+  "license": "MIT",
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@parcel/watcher"
+    ]
+  }
+}
