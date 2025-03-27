@@ -2,6 +2,16 @@ import Papa from "papaparse";
 import { DataModel } from "../../models";
 import { capitalizeFirstLetter } from "mithril-ui-form";
 
+import agressionIcon from "../../assets/icons/noun-conflict-7254668.svg";
+import ptsdIcon from "../../assets/icons/noun-ptsd-2529072.svg";
+import victimIcon from "../../assets/icons/noun-violence-1784961.svg";
+import depressionIcon from "../../assets/icons/noun-depression-7059482.svg";
+import meaningIcon from "../../assets/icons/noun-purpose-6784778.svg";
+import honestyIcon from "../../assets/icons/noun-honesty-7494225.svg";
+import connectionIcon from "../../assets/icons/noun-holding-hands-6084035.svg";
+import appreciationIcon from "../../assets/icons/noun-appreciation-7592051.svg";
+import kindnessIcon from "../../assets/icons/noun-kindness-6014284.svg";
+
 export type LikertScale = 0 | 1 | 2 | 3 | 4 | 5;
 
 export const likertScaleProp = [
@@ -123,6 +133,284 @@ export type UserEntry = UserLikertAnswers & {
   consentToBegeleiderViewing: string;
   uniqueCode: string | number;
   [questionId: string]: number | string; // question IDs will map to numbers
+};
+
+export type UserScore = {
+  respondentId: number;
+  uniqueCode: string | number;
+  date: number;
+  // avgSignificance: number;
+  // avgFairness: number;
+  // avgRelatedness: number;
+  // avgAppreciation: number;
+  // avgPtsdReexp: number;
+  // avgVictim: number;
+  // avgAgreeable: number;
+  // avgDepressArousal: number;
+  // avgPhysAgressResidentsView: number;
+  // avgNonPhysAgressResidentsView: number;
+  // avgPhysAgressStaffsView: number;
+  // avgNonPhysAgressStaffsView: number;
+  agressionResidentsView: Aspect;
+  agressionStaffsView: Aspect;
+  ptsd: Aspect;
+  victim: Aspect;
+  depression: Aspect;
+  meaning: Aspect;
+  honesty: Aspect;
+  kindness: Aspect;
+  connection: Aspect;
+  appreciation: Aspect;
+};
+
+export type Aspect = {
+  title: string;
+  desc?: string;
+  svg: string;
+  score: LikertScore;
+};
+
+export type LikertScore = [
+  physicalAgression: number,
+  nonPhysicalAgression: number
+];
+
+const avg = (...values: number[]) => {
+  const sum = values.reduce((acc, v) => acc + v, 0);
+  return sum / values.length;
+};
+
+const modZ = (T2: number, I2: number, K2: number) => (0.6745 * (T2 - I2)) / K2;
+
+const convertDDMMYYYYToDate = (dateString: string): Date | null => {
+  const parts = dateString.split("-");
+  if (parts.length !== 3) {
+    return null; // Invalid format
+  }
+
+  const day = parseInt(parts[0], 10);
+  const month = parseInt(parts[1], 10);
+  const year = parseInt(parts[2], 10);
+
+  // Month in JavaScript Date object is 0-indexed (0 for January, 11 for December)
+  if (
+    isNaN(day) ||
+    isNaN(month) ||
+    isNaN(year) ||
+    month < 1 ||
+    month > 12 ||
+    day < 1 ||
+    day > new Date(year, month, 0).getDate()
+  ) {
+    return null; // Invalid date values
+  }
+
+  return new Date(year, month - 1, day);
+};
+
+export const userEntryToScore = (entry: UserEntry): UserScore => {
+  const {
+    respondentId,
+    uniqueCode,
+    startDate,
+    endDate = startDate,
+    nicePersonnel,
+    honestRules,
+    nicePeople,
+    caringPeople,
+    closeness,
+    dignity,
+    supportiveOfNeeds,
+    heard,
+    appreciated,
+    upset,
+    flashbacks,
+    anxiety,
+    down,
+    sleepDifficulty,
+    irritated,
+    niceActivities,
+    concentration,
+    avoidContact,
+    victimOfViolence,
+    physicalViolenceUsed,
+    lifeMeaningful,
+    senseOfPurpose,
+    meaningfulActivities,
+    // violenceNeverAcceptable,
+    // acceptableViolenceSituations,
+    // selfDefenseAllowed,
+    // drugUseForMood,
+    // sleepOrMedicationForMood,
+    // alcoholUseForMood,
+    frequencyOfPhysicalViolence,
+    // selfOccupancy,
+    // sufficientActivities,
+    // dailyVariation,
+    fairTreatmentInAzc,
+    influenceOnRulesAndAppointments,
+    // coerceOthers,
+    // rigidWaysOfDoingThings,
+    // ordersOthersToFollowMe,
+    rudeTowardsOthers,
+    capacityForForgiveness,
+    attentiveAndKind,
+    // controlOverAnger,
+    // perceivedAsImpulsive,
+    // dominatedByAnger,
+    threateningBodyLanguage,
+    insultingLanguage,
+    deceptionForPersonalGain,
+    frequencyOfThreateningBodyLanguage,
+    frequencyOfInsultingLanguage,
+    frequencyOfDeceptionForPersonalGain,
+  } = entry;
+
+  let date = Date.now();
+  try {
+    const d = convertDDMMYYYYToDate(endDate);
+    if (d) {
+      date = d.valueOf();
+    }
+  } catch {
+    console.error("Invalid date", endDate);
+  }
+
+  const avgSignificance = avg(
+    lifeMeaningful,
+    senseOfPurpose,
+    meaningfulActivities
+  );
+  const avgFairness = avg(
+    fairTreatmentInAzc,
+    influenceOnRulesAndAppointments,
+    honestRules
+  );
+  const avgRelatedness = avg(
+    nicePersonnel,
+    nicePeople,
+    caringPeople,
+    closeness
+  );
+  const avgAppreciation = avg(dignity, supportiveOfNeeds, heard, appreciated);
+  const avgPtsdReexp = avg(upset, flashbacks, anxiety);
+  const avgDepressArousal = avg(
+    down,
+    sleepDifficulty,
+    irritated,
+    niceActivities,
+    concentration,
+    avoidContact
+  );
+  const avgVictim = avg(victimOfViolence);
+  const avgAgreeable = avg(
+    rudeTowardsOthers,
+    capacityForForgiveness,
+    attentiveAndKind
+  );
+  const avgPhysAgressResidentsView = avg(frequencyOfPhysicalViolence);
+  const avgNonPhysAgressResidentsView = avg(
+    threateningBodyLanguage,
+    insultingLanguage,
+    deceptionForPersonalGain
+  );
+  const avgPhysAgressStaffsView = avg(physicalViolenceUsed);
+  const avgNonPhysAgressStaffsView = avg(
+    frequencyOfThreateningBodyLanguage,
+    frequencyOfInsultingLanguage,
+    frequencyOfDeceptionForPersonalGain
+  );
+
+  const agressionResidentsView = {
+    score: [avgPhysAgressResidentsView, avgNonPhysAgressResidentsView],
+    title: "Agressie (bewoner)",
+    svg: agressionIcon,
+  } as Aspect;
+
+  const agressionStaffsView = {
+    score: [avgPhysAgressStaffsView, avgNonPhysAgressStaffsView],
+    title: "Agressie (medewerker)",
+    svg: agressionIcon,
+  } as Aspect;
+
+  const meaning = {
+    score: [modZ(avgSignificance, 4.0, 1.0), modZ(avgSignificance, 4.0, 1.0)],
+    title: "Zingeving",
+    svg: meaningIcon,
+  } as Aspect;
+
+  const honesty = {
+    score: [modZ(avgFairness, 3.67, 1.0), modZ(avgFairness, 3.67, 1.0)],
+    title: "Eerlijkheid",
+    svg: honestyIcon,
+  } as Aspect;
+
+  const connection = {
+    score: [modZ(avgRelatedness, 3.33, 0.67), modZ(avgRelatedness, 3.33, 0.67)],
+    title: "Verbinding",
+    svg: connectionIcon,
+  } as Aspect;
+
+  const appreciation = {
+    score: [modZ(avgAppreciation, 4, 1), modZ(avgAppreciation, 4, 1)],
+    title: "Waardering",
+    svg: appreciationIcon,
+  } as Aspect;
+
+  const ptsd = {
+    score: [modZ(avgPtsdReexp, 2.67, 0.67), modZ(avgPtsdReexp, 2.67, 0.67)],
+    title: "PTSS herbeleving",
+    svg: ptsdIcon,
+  } as Aspect;
+
+  const victim = {
+    score: [modZ(avgVictim, 2.5, 1.5), modZ(avgVictim, 2.0, 1.0)], // Note: scores are different
+    title: "Slachtoffer of getuige van geweld",
+    svg: victimIcon,
+  } as Aspect;
+
+  const kindness = {
+    score: [modZ(avgAgreeable, 4.67, 0.33), modZ(avgAgreeable, 4.67, 0.33)],
+    title: "Vriendelijkheid",
+    svg: kindnessIcon,
+  } as Aspect;
+
+  const depression = {
+    score: [
+      modZ(avgDepressArousal, 2.4, 0.6),
+      modZ(avgDepressArousal, 2.4, 0.6),
+    ],
+    title: "Neerslachtigheid",
+    svg: depressionIcon,
+  } as Aspect;
+
+  return {
+    respondentId,
+    uniqueCode,
+    date,
+    // avgSignificance,
+    // avgFairness,
+    // avgRelatedness,
+    // avgAppreciation,
+    // avgPtsdReexp,
+    // avgDepressArousal,
+    // avgVictim,
+    // avgAgreeable,
+    // avgPhysAgressResidentsView,
+    // avgNonPhysAgressResidentsView,
+    // avgPhysAgressStaffsView,
+    // avgNonPhysAgressStaffsView,
+    agressionResidentsView,
+    agressionStaffsView,
+    meaning,
+    honesty,
+    connection,
+    appreciation,
+    ptsd,
+    victim,
+    kindness,
+    depression,
+  } as UserScore;
 };
 
 // Mapping for answer conversion: Nooit	Soms	Regelmatig	Vaak	Altijd	Zeg ik liever niet
