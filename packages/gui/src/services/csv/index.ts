@@ -132,9 +132,17 @@ export type UserEntry = UserLikertAnswers & {
   respondentId: number;
   startDate: string;
   startTime: string;
+  /** Numeric representation of the end date, or start date */
+  date: number;
+  /** Number of questions in the questionnaire */
+  questionCnt: number;
+  /** Number of questions that were actually answered */
+  answeredCnt: number;
+  /** Number of questions that were answered with "Zeg ik liever niet" */
+  declinedCnt: number;
   endDate: string;
   status: string;
-  gender: number;
+  gender: string;
   age: number | string;
   azcMonths: number | string;
   consentToBegeleiderViewing: string;
@@ -145,7 +153,14 @@ export type UserEntry = UserLikertAnswers & {
 export type UserScore = {
   respondentId: number;
   uniqueCode: string | number;
+  /** Numeric representation of the end date, or start date */
   date: number;
+  /** Number of questions in the questionnaire */
+  questionCnt: number;
+  /** Number of questions that were actually answered */
+  answeredCnt: number;
+  /** Number of questions that were answered with "Zeg ik liever niet" */
+  declinedCnt: number;
   // avgSignificance: number;
   // avgFairness: number;
   // avgRelatedness: number;
@@ -261,12 +276,22 @@ const addTitleAndDescToFactor = (factor: Factor): Factor => {
   return { ...factor, title, desc, activity } as Factor;
 };
 
+// const countUnansweredAndDeclined = (data: UserEntry): { questionCnt: number; answeredCnt: number; declinedCnt: number } => {
+//   return Object.entries(data).reduce(
+//     (acc, [key, value]) =>
+//       acc,
+//     { questionCnt: 0, answeredCnt: 0, declinedCnt: 0,}
+//   );
+// };
+
 export const userEntryToScore = (entry: UserEntry): UserScore => {
   const {
     respondentId,
     uniqueCode,
-    startDate,
-    endDate = startDate,
+    date,
+    questionCnt,
+    answeredCnt,
+    declinedCnt,
     nicePersonnel,
     honestRules,
     nicePeople,
@@ -318,16 +343,6 @@ export const userEntryToScore = (entry: UserEntry): UserScore => {
     frequencyOfInsultingLanguage,
     frequencyOfDeceptionForPersonalGain,
   } = entry;
-
-  let date = Date.now();
-  try {
-    const d = convertDDMMYYYYToDate(endDate);
-    if (d) {
-      date = d.valueOf();
-    }
-  } catch {
-    console.error("Invalid date", endDate);
-  }
 
   const avgSignificance = avg(
     lifeMeaningful,
@@ -455,6 +470,9 @@ export const userEntryToScore = (entry: UserEntry): UserScore => {
     respondentId,
     uniqueCode,
     date,
+    questionCnt,
+    answeredCnt,
+    declinedCnt,
     // avgSignificance,
     // avgFairness,
     // avgRelatedness,
@@ -591,7 +609,23 @@ export async function processCSV(file: File): Promise<UserEntry[]> {
       complete: (results) => {
         // Process the data
         const processedData: UserEntry[] = results.data.map((row) => {
-          const entry = {} as UserEntry;
+          let date = Date.now();
+          let endDate = (row["Eind datum"] || row["Start datum"]) as string;
+          console.log(endDate);
+          try {
+            const d = convertDDMMYYYYToDate(endDate);
+            if (d) {
+              date = d.valueOf();
+            }
+          } catch {
+            console.error("Invalid date", endDate);
+          }
+          const entry = {
+            date,
+            questionCnt: 0,
+            answeredCnt: 0,
+            declinedCnt: 0,
+          } as UserEntry;
 
           // Transform question answers
           Object.entries(row).forEach(([originalHeader, value]) => {
@@ -600,14 +634,19 @@ export async function processCSV(file: File): Promise<UserEntry[]> {
               typeof value === "string"
                 ? (value as string).toLowerCase().trim()
                 : undefined;
-
-            entry[questionId] =
+            const answer =
               answerText && answerScale.hasOwnProperty(answerText)
                 ? answerScale[answerText]
                 : value;
+            entry.questionCnt++;
+            if (answer === 0) {
+              entry.answeredCnt++;
+              entry.declinedCnt++;
+            } else if (answer) {
+              entry.answeredCnt++;
+            }
+            entry[questionId] = answer;
           });
-
-          // console.log(entry);
           return entry;
         });
 

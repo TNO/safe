@@ -8,19 +8,11 @@ import {
   questionnaire,
   t,
   UserEntry,
-  userEntryToScore,
 } from "../services";
-import {
-  Collapsible,
-  IInputOption,
-  InputCheckbox,
-  Select,
-  Tabs,
-} from "mithril-materialized";
-import fist from "../assets/icons/noun-fist-hand-5029035.svg";
-import middleFinger from "../assets/icons/noun-middle-finger-5029034.svg";
-import { EmojiScoreComponent } from "./ui/emoji";
-import { SlimdownView } from "mithril-ui-form";
+import { IInputOption, Select, Tabs } from "mithril-materialized";
+import { Dashboard } from "./ui/dashboard";
+const silenceIcon =
+  "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYwMCIgaGVpZ2h0PSIxNjAwIiB2aWV3Qm94PSIwIDAgMTIwMCAxMjAwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik02MDAgMEMyNjkuMTUgMCAwIDI2OS4xNSAwIDYwMGMwIDE1NCA1OC44MDEgMzAwLjY1IDE2NS42IDQxMi45NSA2LjIgNi40NSAxNS4zMDEgOS4yNSAyMy45NDkgNy4wNSA4LjctMi4xIDE1LjYwMi04LjY0OCAxOC4xMDItMTcuMjUgMjAuNzUtNzAuNDQ4IDg3LjI1LTEyNi4xIDE3My42LTE0NS4yIDEyLjI1LTIuNjk4IDIwLjYwMi0xNC4xMDEgMTkuNS0yNi42NDctLjA1NS0uMzUyLS43MDMtNS41MDQtLjc1NC01LjkwMyAwLTI4LjQ0OSAxNi4xMDItNTQuMTAyIDQyLTY2Ljg5OCA2LjM5OC0zLjE0OCAxMS4xNDgtOC45NDkgMTMuMDUxLTE1LjhDNDY5Ljg1IDY4Ny45NDggNTE5LjE5NiA2NTAgNTc0Ljk5OCA2NTBjNTIuMzUyIDAgOTkuNDUgMzMuNSAxMTcuMjUgODMuMzk4IDMuNSA5Ljk1IDEzIDE2LjYwMiAyMy41NTEgMTYuNjAyaDkuMmM0MS4zNTEgMCA3NSAzMy42NDggNzUgNzVzLTMzLjY0OSA3NS03NSA3NWMtMTMuODAyIDAtMjUgMTEuMi0yNSAyNXYxMjVjMCAzNi41LTEyLjA1MiA3MS4yNS0zNS44NTMgMTAzLjI1LTYgOC4xNDktNi42MDEgMTkuMDUxLTEuMzUxIDI3Ljc1YTI0Ljk2MSAyNC45NjEgMCAwMDIxLjQ0OSAxMi4yYzEuMTk5IDAgMi40NDktLjEwMiAzLjY0OC0uMjUgMjkxLjk2LTQzIDUxMi4xMS0yOTcuOSA1MTIuMTEtNTkyLjk1IDAtMzMwLjg1LTI2OS4xNS02MDAtNjAwLTYwMHpNMzc1IDUwMGMtNDEuMzUyIDAtNzUtMzMuNjQ4LTc1LTc1czMzLjY0OC03NSA3NS03NSA3NSAzMy42NDggNzUgNzUtMzMuNjQ4IDc1LTc1IDc1em00NTAgMGMtNDEuMzUyIDAtNzUtMzMuNjQ4LTc1LTc1czMzLjY0OC03NSA3NS03NSA3NSAzMy42NDggNzUgNzUtMzMuNjQ4IDc1LTc1IDc1eiIvPjxwYXRoIGQ9Ik03MjUgODUwSDYyNWMtMTMuODAxIDAtMjUtMTEuMTk5LTI1LTI1czExLjE5OS0yNSAyNS0yNWgxMDBjMTMuODAxIDAgMjUgMTEuMTk5IDI1IDI1cy0xMS4xOTkgMjUtMjUgMjV6bS0yMDAgMGgtNTBjLTEzLjgwMSAwLTI1LTExLjE5OS0yNS0yNXMxMS4xOTktMjUgMjUtMjVoNTBjMTMuODAxIDAgMjUgMTEuMTk5IDI1IDI1cy0xMS4xOTkgMjUtMjUgMjV6Ii8+PHBhdGggZD0iTTU3NSA3MDBjLTQxLjM1MiAwLTc1IDMzLjY0OC03NSA3NXYxMjUuOTVjLTIyLjg1Mi0uOC00OS42MDItLjk1LTUwLS45NS0xMTAuMyAwLTIwMCA2Ny4zMDItMjAwIDE1MHM4OS42OTkgMTUwIDIwMCAxNTAgMjAwLTY3LjMgMjAwLTE1MFY3NzVjMC00MS4zNTEtMzMuNjQ4LTc1LTc1LTc1eiIvPjwvc3ZnPg==";
 
 export const Questionnaire: FactoryComponent<{ data: UserEntry[] }> = () => {
   return {
@@ -52,207 +44,80 @@ export const Questionnaire: FactoryComponent<{ data: UserEntry[] }> = () => {
   };
 };
 
-export const PhysicalAgression: FactoryComponent<{ score: number }> = () => {
+export const Stats: FactoryComponent<{ data: UserEntry }> = () => {
   return {
-    view: ({ attrs: { score } }) => {
-      return m(
-        ".flex-item",
-        {
-          style: {
-            position: "relative",
-            width: "130px",
-            height: "130px",
-          },
+    view: ({
+      attrs: {
+        data: {
+          questionCnt = 1,
+          answeredCnt,
+          declinedCnt,
+          gender,
+          age,
+          azcMonths,
         },
-
-        m("img", {
-          src: fist,
-          alt: "Fysieke agressie",
-          width: 130,
-          height: 130,
-          style: { opacity: 0.08 },
-        }),
-        m(EmojiScoreComponent, {
-          value: score,
-          size: 70,
-          style: {
-            position: "absolute",
-            bottom: "10px",
-            left: "42px",
-            translate: "rotate(45deg)",
-          },
-        })
-      );
-    },
-  };
-};
-
-export const NonPhysicalAgression: FactoryComponent<{ score: number }> = () => {
-  return {
-    view: ({ attrs: { score } }) => {
+      },
+    }) => {
       return m(
-        ".flex-item",
-        {
-          style: {
-            position: "relative",
-            width: "130px",
-            height: "130px",
-          },
-        },
-
-        m("img", {
-          src: middleFinger,
-          alt: "Niet fysieke agressie",
-          width: 130,
-          height: 130,
-          style: { opacity: 0.08 },
-        }),
-        m(EmojiScoreComponent, {
-          value: score,
-          size: 70,
-          style: {
-            position: "absolute",
-            bottom: "10px",
-            left: "42px",
-            translate: "rotate(45deg)",
-          },
-        })
-      );
-    },
-  };
-};
-
-export const Dashboard: FactoryComponent<{
-  data: UserEntry[];
-  showAllFactors?: boolean;
-  update: (state: { showAllFactors: boolean }) => void;
-}> = () => {
-  return {
-    view: ({ attrs: { data, showAllFactors = false, update } }) => {
-      const scores = data.map(userEntryToScore);
-      console.log(scores);
-      const scoreItems = scores.reduce((acc, s) => {
-        const {
-          agressionResidentsView,
-          agressionStaffsView,
-          meaning,
-          honesty,
-          connection,
-          appreciation,
-          ptsd,
-          victim,
-          kindness,
-          depression,
-        } = s;
-        acc.push(
-          ...[
-            agressionStaffsView,
-            agressionResidentsView,
-            ptsd,
-            victim,
-            depression,
-            meaning,
-            honesty,
-            connection,
-            appreciation,
-            kindness,
-          ].map(({ title, svg, score, desc, activity }) => ({
-            title,
-            svgIcon: svg,
-            score1: score[0],
-            score2: score[1],
-            description: desc
-              ? desc[0] !== desc[1]
-                ? desc.join(" ")
-                : desc[0]
-              : "",
-            activity: activity
-              ? activity[0] !== activity[1]
-                ? activity.join(" ")
-                : activity[0]
-              : "",
-          }))
-        );
-        return acc;
-      }, [] as Array<{ title: string; svgIcon: string; score1: number; score2: number; description: string; activity: string }>);
-      console.log(scoreItems);
-
-      return (
-        scoreItems.length > 0 &&
-        m(".row", [
-          m(InputCheckbox, {
-            label: "Toon alle aspecten",
-            className: "right",
-            checked: showAllFactors,
-            onchange: (v) => {
-              update({ showAllFactors: v });
-            },
-          }),
-
-          m(Collapsible, {
-            accordion: true,
-            className: "col s12",
-            items: scoreItems
-              .filter(
-                (i) =>
-                  showAllFactors ||
-                  Math.abs(i.score1) >= 1 ||
-                  Math.abs(i.score2) >= 1
-              )
-              .map(
-                ({ title, svgIcon, score1, score2, description, activity }) => {
-                  return {
-                    header: m(".flex-container", [
-                      [
-                        m(
-                          ".flex-item",
-                          // Title
-                          m(
-                            "span",
-                            {
-                              style: {
-                                fontSize: "24px",
-                                fontWeight: "bold",
-                                verticalAlign: "top",
-                                textAlign: "center",
-                              },
-                            },
-                            title
-                          ),
-                          m("img", {
-                            style:
-                              "display: block; width: 70px; height: 70px; vertical-align: middle;",
-                            src: svgIcon,
-                          })
-                        ),
-
-                        m(PhysicalAgression, { score: score1 }),
-                        m(NonPhysicalAgression, { score: score2 }),
-                      ],
-                      // ),
-                    ]),
-                    body: m(
-                      ".row",
-                      m(
-                        ".col.s12.m6",
-                        description &&
-                          m(SlimdownView, {
-                            md: "### Wat betekent dit?\n\n" + description,
-                          })
-                      ),
-                      m(
-                        ".col.s12.m6",
-                        activity &&
-                          m(SlimdownView, {
-                            md: "### Wat kan ik doen?\n\n" + activity,
-                          })
-                      )
-                    ),
-                  };
-                }
-              ),
-          }),
-        ])
+        "ul.list-inline.stats",
+        m(
+          "li.tooltip",
+          m(
+            "i.material-icons",
+            gender === "Man"
+              ? "man"
+              : gender === "Vrouw"
+              ? "woman"
+              : "question_mark"
+          ),
+          `${age} jaar`,
+          m(
+            "span.tooltiptext",
+            `Respondent is een ${
+              gender ? gender.toLowerCase() : "?"
+            } van ${age} jaar.`
+          )
+        ),
+        azcMonths &&
+          m(
+            "li.tooltip",
+            m("i.material-icons", "house"),
+            `${azcMonths} maanden`,
+            m(
+              "span.tooltiptext",
+              `Respondent woont al ${azcMonths} maanden in een AZC.`
+            )
+          ),
+        m(
+          "li.tooltip",
+          m("i.material-icons", "check"),
+          `${Math.round((answeredCnt * 100) / questionCnt)}%`,
+          m(
+            "span.tooltiptext",
+            `Respondent heeft ${
+              answeredCnt === questionCnt
+                ? "alle"
+                : `${answeredCnt} van de ${questionCnt}`
+            } vragen beantwoord.`
+          )
+        ),
+        declinedCnt > 0 &&
+          m(
+            "li.tooltip",
+            m("img", {
+              width: "20px",
+              height: "20px",
+              alt: 'Aantal vragen beantwoord met "Zeg ik liever niet/"',
+              src: silenceIcon,
+            }),
+            `${declinedCnt === 1 ? "1 vraag" : `${declinedCnt} vragen`}`,
+            m(
+              "span.tooltiptext",
+              `Respondent heeft ${
+                declinedCnt === 1 ? "1 vraag" : `${declinedCnt} vragen`
+              } beantwoordt met "Zeg ik liever niet".`
+            )
+          )
       );
     },
   };
@@ -279,9 +144,13 @@ export const HomePage: MeiosisComponent = () => {
     view: ({ attrs: { state, actions } }) => {
       const { model = EmptyDataModel(), selectedId, showAllFactors } = state;
       const { data = [] } = model;
-      data.sort((a, b) => (a.faseId > b.faseId ? -1 : 1));
+      // data.sort((a, b) => (a.date > b.date ? -1 : 1));
 
-      const filteredData = data.filter((d) => d.uniqueCode == selectedId);
+      const filteredData = selectedId
+        ? data
+            .filter((d) => d.uniqueCode == selectedId)
+            .sort((a, b) => (a.date > b.date ? -1 : 1))
+        : [];
 
       return [
         m(
@@ -297,17 +166,21 @@ export const HomePage: MeiosisComponent = () => {
                 ),
               ]
             : [
+                m(
+                  ".col.s12.m8.l9",
+                  selectedId &&
+                    m(Stats, { data: filteredData[filteredData.length - 1] })
+                ),
                 m(Select, {
                   label: "Selecteer unieke gebruikerscode",
                   options: userIdOptions,
                   initialValue: selectedId,
                   placeholder: "Kies een code",
-                  className: "col s12 m4 l3 offset-m8 offset-l9",
+                  className: "col s12 m4 l3",
                   onchange: (v) => {
                     actions.update({ selectedId: v[0] });
                   },
                 }),
-
                 selectedId &&
                   m(Tabs, {
                     className: "col s12",

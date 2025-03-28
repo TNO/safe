@@ -304,30 +304,37 @@ li.collection-item:first-child {
 /* Tooltip text */
 .tooltip .tooltiptext {
   visibility: hidden;
-  width: 320px;
-  background-color: black;
+  width: 180px;
+  background-color: rgba(0, 0, 0, 0.8);
   color: #fff;
   text-align: center;
   padding: 5px;
-  border-radius: 6px;
-  font-size: 1rem;
-  line-height: 2rem;
-  /* Position the tooltip text - see examples below! */
+  border-radius: 4px;
   position: absolute;
   z-index: 1;
+  top: 125%; /* Position below the container */
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0;
+  transition: opacity 0.3s;
 }
 
 /* Show the tooltip text when you mouse over the tooltip container */
 .tooltip:hover .tooltiptext {
   visibility: visible;
+  opacity: 1;
+}
+.tooltip-text::after {
+  content: "";
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: transparent transparent rgba(0, 0, 0, 0.8) transparent;
 }
 
-.tooltip .tooltiptext {
-  width: 150px;
-  margin-left: -75px; /* Use half of the width to center the tooltip */
-  top: 100%;
-  left: 50%;
-}
 /** End Tooltips */
 
 .user-page {
@@ -668,4 +675,17 @@ a.waves-effect.waves-teal.btn-flat.selected {
 }
 .markdown h3 {
   margin-top: 0;
+}
+ul.stats {
+  border: #000000 1px solid;
+  border-radius: 5px;
+  padding: 7px;
+}
+ul.stats > li {
+  margin-right: 15px;
+}
+ul.stats > li > i,
+img {
+  margin-right: 5px;
+  vertical-align: middle;
 }

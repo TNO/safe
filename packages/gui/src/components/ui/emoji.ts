@@ -83,7 +83,7 @@ export const EmojiScoreComponent: m.FactoryComponent<EmojiAttrs> = () => {
               emoji,
           })
         ),
-        m("span", value.toFixed(1)),
+        // m("span", value.toFixed(1)),
       ];
     },
   };
