@@ -15,7 +15,7 @@ const devMode = (process.env as any).NODE_ENV === "development";
 const isProduction = !devMode;
 const outputPath = resolve(process.cwd(), isProduction ? "../../docs" : "dist");
 const SERVER = process.env.SERVER || "localhost";
-const publicPath = isProduction ? "https://tno.github.io/COMPASS" : "";
+const publicPath = isProduction ? "https://tno.github.io/COMPASS/" : "";
 const APP_TITLE = "COA COMPASS";
 const APP_DESC =
   "Tool voor de evaluatie van het gedrag van bewoners van COA centra";
@@ -50,7 +50,7 @@ const configuration: Configuration = {
       publicPath,
       scriptLoading: "defer",
       minify: !devMode,
-      favicon: "./src/favicon.ico",
+      favicon: isProduction ? "favicon.ico" : "./src/favicon.ico",
       meta: {
         viewport: "width=device-width, initial-scale=1",
         "og:title": APP_TITLE,
@@ -58,7 +58,7 @@ const configuration: Configuration = {
         "og:url": SERVER || "",
         "og:site_name": APP_TITLE,
         "og:image:alt": APP_TITLE,
-        "og:image": "./src/assets/logo.svg",
+        "og:image": "https://tno.github.io/COMPASS/assets/logo.svg",
         "og:image:type": "image/svg",
         "og:image:width": "200",
         "og:image:height": "200",
