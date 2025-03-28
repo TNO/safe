@@ -66,22 +66,25 @@ export const EmojiScoreComponent: m.FactoryComponent<EmojiAttrs> = () => {
         fillColor = colors.white;
       } else if (value < limits.positive) {
         emoji = emojis.emoji4;
-        fillColor = colors.greenLight;
+        fillColor = colors.green;
       } else {
         emoji = emojis.emoji5;
-        fillColor = colors.green;
+        fillColor = colors.greenLight;
       }
 
-      return m(
-        "svg",
-        { width: size, height: size, viewBox: "0 0 1200 1600", style },
-        m("path", {
-          fill: fillColor,
-          d:
-            "M600 30C285.6 30 30 285.6 30 600s255.6 570 570 570 570-255.6 570-570S914.4 30 600 30z" +
-            emoji,
-        })
-      );
+      return [
+        m(
+          "svg",
+          { width: size, height: size, viewBox: "0 0 1200 1600", style },
+          m("path", {
+            fill: fillColor,
+            d:
+              "M600 30C285.6 30 30 285.6 30 600s255.6 570 570 570 570-255.6 570-570S914.4 30 600 30z" +
+              emoji,
+          })
+        ),
+        m("span", value.toFixed(1)),
+      ];
     },
   };
 };

@@ -20,6 +20,7 @@ import {
 import fist from "../assets/icons/noun-fist-hand-5029035.svg";
 import middleFinger from "../assets/icons/noun-middle-finger-5029034.svg";
 import { EmojiScoreComponent } from "./ui/emoji";
+import { SlimdownView } from "mithril-ui-form";
 
 export const Questionnaire: FactoryComponent<{ data: UserEntry[] }> = () => {
   return {
@@ -121,11 +122,13 @@ export const NonPhysicalAgression: FactoryComponent<{ score: number }> = () => {
   };
 };
 
-export const Dashboard: FactoryComponent<{ data: UserEntry[] }> = () => {
-  let showAllItems = false;
-
+export const Dashboard: FactoryComponent<{
+  data: UserEntry[];
+  showAllFactors?: boolean;
+  update: (state: { showAllFactors: boolean }) => void;
+}> = () => {
   return {
-    view: ({ attrs: { data } }) => {
+    view: ({ attrs: { data, showAllFactors = false, update } }) => {
       const scores = data.map(userEntryToScore);
       console.log(scores);
       const scoreItems = scores.reduce((acc, s) => {
@@ -143,102 +146,120 @@ export const Dashboard: FactoryComponent<{ data: UserEntry[] }> = () => {
         } = s;
         acc.push(
           ...[
-            agressionResidentsView,
             agressionStaffsView,
+            agressionResidentsView,
+            ptsd,
+            victim,
+            depression,
             meaning,
             honesty,
             connection,
             appreciation,
-            ptsd,
-            victim,
             kindness,
-            depression,
-          ].map(({ title, svg, score }) => ({
+          ].map(({ title, svg, score, desc, activity }) => ({
             title,
             svgIcon: svg,
             score1: score[0],
             score2: score[1],
-            description: "",
+            description: desc
+              ? desc[0] !== desc[1]
+                ? desc.join(" ")
+                : desc[0]
+              : "",
+            activity: activity
+              ? activity[0] !== activity[1]
+                ? activity.join(" ")
+                : activity[0]
+              : "",
           }))
         );
         return acc;
-      }, [] as Array<{ title: string; svgIcon: string; score1: number; score2: number; description: string }>);
+      }, [] as Array<{ title: string; svgIcon: string; score1: number; score2: number; description: string; activity: string }>);
       console.log(scoreItems);
 
-      return m(".row", [
-        m(InputCheckbox, {
-          label: "Toon alle aspecten",
-          className: "right",
-          checked: showAllItems,
-          onchange: (v) => (showAllItems = v),
-        }),
+      return (
         scoreItems.length > 0 &&
+        m(".row", [
+          m(InputCheckbox, {
+            label: "Toon alle aspecten",
+            className: "right",
+            checked: showAllFactors,
+            onchange: (v) => {
+              update({ showAllFactors: v });
+            },
+          }),
+
           m(Collapsible, {
             accordion: true,
             className: "col s12",
             items: scoreItems
               .filter(
                 (i) =>
-                  showAllItems ||
+                  showAllFactors ||
                   Math.abs(i.score1) >= 1 ||
                   Math.abs(i.score2) >= 1
               )
-              .map(({ title, svgIcon, score1, score2, description }) => {
-                return {
-                  header: m(".flex-container", [
-                    // Likert Scales (Traffic Lights) in header
-                    // m(
-                    //   ".scores",
-                    //   {
-                    //     // style: "display: flex; gap: 20px; align-items: center;",
-                    //   },
-                    [
-                      m(
-                        ".flex-item",
-                        // Title
+              .map(
+                ({ title, svgIcon, score1, score2, description, activity }) => {
+                  return {
+                    header: m(".flex-container", [
+                      [
                         m(
-                          "span",
-                          {
-                            style: {
-                              fontSize: "24px",
-                              fontWeight: "bold",
-                              verticalAlign: "top",
-                              textAlign: "center",
+                          ".flex-item",
+                          // Title
+                          m(
+                            "span",
+                            {
+                              style: {
+                                fontSize: "24px",
+                                fontWeight: "bold",
+                                verticalAlign: "top",
+                                textAlign: "center",
+                              },
                             },
-                          },
-                          title
+                            title
+                          ),
+                          m("img", {
+                            style:
+                              "display: block; width: 70px; height: 70px; vertical-align: middle;",
+                            src: svgIcon,
+                          })
                         ),
-                        m("img", {
-                          style:
-                            "display: block; width: 70px; height: 70px; vertical-align: middle;",
-                          src: svgIcon,
-                        })
-                      ),
 
-                      m(PhysicalAgression, { score: score1 }),
-                      m(NonPhysicalAgression, { score: score2 }),
-                    ],
-                    // ),
-                  ]),
-                  body: m(
-                    "p",
-                    {
-                      style:
-                        "font-size: 14px; padding: 15px; line-height: 1.5;",
-                    },
-                    description
-                  ),
-                };
-              }),
+                        m(PhysicalAgression, { score: score1 }),
+                        m(NonPhysicalAgression, { score: score2 }),
+                      ],
+                      // ),
+                    ]),
+                    body: m(
+                      ".row",
+                      m(
+                        ".col.s12.m6",
+                        description &&
+                          m(SlimdownView, {
+                            md: "### Wat betekent dit?\n\n" + description,
+                          })
+                      ),
+                      m(
+                        ".col.s12.m6",
+                        activity &&
+                          m(SlimdownView, {
+                            md: "### Wat kan ik doen?\n\n" + activity,
+                          })
+                      )
+                    ),
+                  };
+                }
+              ),
           }),
-      ]);
+        ])
+      );
     },
   };
 };
 
 export const HomePage: MeiosisComponent = () => {
   let userIdOptions: IInputOption<string | number>[];
-  let selectedCode: string | number;
 
   return {
     oninit: ({
@@ -255,12 +276,12 @@ export const HomePage: MeiosisComponent = () => {
       }));
       setPage(Pages.HOME);
     },
-    view: ({ attrs: { state } }) => {
-      const { model = EmptyDataModel() } = state;
+    view: ({ attrs: { state, actions } }) => {
+      const { model = EmptyDataModel(), selectedId, showAllFactors } = state;
       const { data = [] } = model;
       data.sort((a, b) => (a.faseId > b.faseId ? -1 : 1));
 
-      const filteredData = data.filter((d) => d.uniqueCode == selectedCode);
+      const filteredData = data.filter((d) => d.uniqueCode == selectedId);
 
       return [
         m(
@@ -279,32 +300,36 @@ export const HomePage: MeiosisComponent = () => {
                 m(Select, {
                   label: "Selecteer unieke gebruikerscode",
                   options: userIdOptions,
+                  initialValue: selectedId,
                   placeholder: "Kies een code",
                   className: "col s12 m4 l3 offset-m8 offset-l9",
                   onchange: (v) => {
-                    selectedCode = v[0];
+                    actions.update({ selectedId: v[0] });
                   },
                 }),
 
-                m(Tabs, {
-                  className: "col s12",
-                  tabs: [
-                    {
-                      id: "dashboard",
-                      title: "Dashboard",
-                      vnode: m(Dashboard, {
-                        data: filteredData,
-                      }),
-                    },
-                    {
-                      id: "questions",
-                      title: "Vragenlijst",
-                      vnode: m(Questionnaire, {
-                        data: filteredData,
-                      }),
-                    },
-                  ],
-                }),
+                selectedId &&
+                  m(Tabs, {
+                    className: "col s12",
+                    tabs: [
+                      {
+                        id: "dashboard",
+                        title: "Dashboard",
+                        vnode: m(Dashboard, {
+                          data: filteredData,
+                          showAllFactors,
+                          update: actions.update,
+                        }),
+                      },
+                      {
+                        id: "questions",
+                        title: "Vragenlijst",
+                        vnode: m(Questionnaire, {
+                          data: filteredData,
+                        }),
+                      },
+                    ],
+                  }),
               ]
         ),
       ];

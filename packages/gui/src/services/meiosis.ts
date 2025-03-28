@@ -20,6 +20,8 @@ export interface State {
   settings: Settings;
   searchFilter: string;
   searchResults: any[];
+  selectedId?: string | number;
+  showAllFactors?: boolean;
 }
 
 export interface Actions {
@@ -34,6 +36,7 @@ export interface Actions {
   setRole: (role: UserRole) => void;
   setSearchFilter: (searchFilter?: string) => Promise<void>;
   login: () => void;
+  update: (state: Partial<State>) => void;
 }
 
 export type MeiosisComponent<T extends { [key: string]: any } = {}> =
@@ -49,6 +52,7 @@ export const appActions: (cell: MeiosisCell<State>) => Actions = ({
   // addDucks: (cell, amount) => {
   //   cell.update({ ducks: (value) => value + amount });
   // },
+  update: (state) => update(state),
   setPage: (page, info) => {
     document.title = `${APP_TITLE} | ${page.replace("_", " ")}${
       info ? ` | ${info}` : ""

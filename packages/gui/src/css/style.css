@@ -666,3 +666,6 @@ a.waves-effect.waves-teal.btn-flat.selected {
 .flex-item:first-child {
   margin-right: auto; /* Push the first element to the left */
 }
+.markdown h3 {
+  margin-top: 0;
+}

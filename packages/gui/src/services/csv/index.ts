@@ -11,8 +11,15 @@ import honestyIcon from "../../assets/icons/noun-honesty-7494225.svg";
 import connectionIcon from "../../assets/icons/noun-holding-hands-6084035.svg";
 import appreciationIcon from "../../assets/icons/noun-appreciation-7592051.svg";
 import kindnessIcon from "../../assets/icons/noun-kindness-6014284.svg";
+import { explanations, FactorExplanation } from "./explanations";
 
 export type LikertScale = 0 | 1 | 2 | 3 | 4 | 5;
+
+const categories = {
+  state: "Emotionele toestand",
+  needs: "Behoeften",
+  personality: "Persoonlijkheid",
+};
 
 export const likertScaleProp = [
   "honestRules",
@@ -151,21 +158,36 @@ export type UserScore = {
   // avgNonPhysAgressResidentsView: number;
   // avgPhysAgressStaffsView: number;
   // avgNonPhysAgressStaffsView: number;
-  agressionResidentsView: Aspect;
-  agressionStaffsView: Aspect;
-  ptsd: Aspect;
-  victim: Aspect;
-  depression: Aspect;
-  meaning: Aspect;
-  honesty: Aspect;
-  kindness: Aspect;
-  connection: Aspect;
-  appreciation: Aspect;
+  agressionResidentsView: Factor;
+  agressionStaffsView: Factor;
+  ptsd: Factor;
+  victim: Factor;
+  depression: Factor;
+  meaning: Factor;
+  honesty: Factor;
+  kindness: Factor;
+  connection: Factor;
+  appreciation: Factor;
 };
 
-export type Aspect = {
+export type FactorKey =
+  | "agressionResidentsView"
+  | "agressionStaffsView"
+  | "ptsd"
+  | "victim"
+  | "depression"
+  | "meaning"
+  | "honesty"
+  | "connection"
+  | "appreciation"
+  | "kindness";
+
+export type Factor = {
+  key: FactorKey;
   title: string;
-  desc?: string;
+  category: string;
+  desc?: [physicalAggression: string, nonPhysicalAggression: string];
+  activity?: [physicalAggression: string, nonPhysicalAggression: string];
   svg: string;
   score: LikertScore;
 };
@@ -176,8 +198,11 @@ export type LikertScore = [
 ];
 
 const avg = (...values: number[]) => {
-  const sum = values.reduce((acc, v) => acc + v, 0);
-  return sum / values.length;
+  const [sum, length] = values.reduce(
+    (acc, v) => (v === 0 ? acc : [acc[0] + v, acc[1] + 1]),
+    [0, 0]
+  );
+  return length > 0 ? sum / length : 0;
 };
 
 const modZ = (T2: number, I2: number, K2: number) => (0.6745 * (T2 - I2)) / K2;
@@ -206,6 +231,34 @@ const convertDDMMYYYYToDate = (dateString: string): Date | null => {
   }
 
   return new Date(year, month - 1, day);
+};
+
+const addTitleAndDescToFactor = (factor: Factor): Factor => {
+  const act = (score: number, f: FactorExplanation) =>
+    score <= -1 ? f.actLowScore : score >= 1 ? f.actHighScore : "";
+  const describe = (score: number, f: FactorExplanation) =>
+    score <= -2
+      ? f.expLowest
+      : score <= -1
+      ? f.expLow
+      : score >= 2
+      ? f.expHighest
+      : score >= 1
+      ? f.expHigh
+      : f.expAvg;
+  const { key, score } = factor;
+  const [physicalAgression, nonPhysicalAgression] = score;
+  const explanation = explanations[key];
+  const { title, physical, nonPhysical = physical } = explanation;
+  const activity = [
+    act(physicalAgression, physical),
+    act(nonPhysicalAgression, nonPhysical),
+  ];
+  const desc = [
+    describe(physicalAgression, physical),
+    describe(nonPhysicalAgression, nonPhysical),
+  ];
+  return { ...factor, title, desc, activity } as Factor;
 };
 
 export const userEntryToScore = (entry: UserEntry): UserScore => {
@@ -303,86 +356,100 @@ export const userEntryToScore = (entry: UserEntry): UserScore => {
     avoidContact
   );
   const avgVictim = avg(victimOfViolence);
-  const avgAgreeable = avg(
-    rudeTowardsOthers,
+  const avgKindness = avg(
+    rudeTowardsOthers ? 6 - rudeTowardsOthers : 0, // NOTE: Inverted since it's a negative trait
     capacityForForgiveness,
     attentiveAndKind
   );
-  const avgPhysAgressResidentsView = avg(frequencyOfPhysicalViolence);
-  const avgNonPhysAgressResidentsView = avg(
-    threateningBodyLanguage,
-    insultingLanguage,
-    deceptionForPersonalGain
+  const convertAgression = (score: number) =>
+    score <= 1 ? 2 : score <= 1.5 ? 0 : score <= 2 ? -1 : -2;
+  const avgPhysAgressResidentsView = convertAgression(
+    avg(frequencyOfPhysicalViolence)
   );
-  const avgPhysAgressStaffsView = avg(physicalViolenceUsed);
-  const avgNonPhysAgressStaffsView = avg(
-    frequencyOfThreateningBodyLanguage,
-    frequencyOfInsultingLanguage,
-    frequencyOfDeceptionForPersonalGain
+  const avgNonPhysAgressResidentsView = convertAgression(
+    avg(threateningBodyLanguage, insultingLanguage, deceptionForPersonalGain)
+  );
+  const avgPhysAgressStaffsView = convertAgression(avg(physicalViolenceUsed));
+  const avgNonPhysAgressStaffsView = convertAgression(
+    avg(
+      frequencyOfThreateningBodyLanguage,
+      frequencyOfInsultingLanguage,
+      frequencyOfDeceptionForPersonalGain
+    )
   );
 
-  const agressionResidentsView = {
+  const agressionResidentsView = addTitleAndDescToFactor({
+    key: "agressionResidentsView",
     score: [avgPhysAgressResidentsView, avgNonPhysAgressResidentsView],
-    title: "Agressie (bewoner)",
+    category: categories.state,
     svg: agressionIcon,
-  } as Aspect;
+  } as Factor);
 
-  const agressionStaffsView = {
+  const agressionStaffsView = addTitleAndDescToFactor({
+    key: "agressionStaffsView",
     score: [avgPhysAgressStaffsView, avgNonPhysAgressStaffsView],
-    title: "Agressie (medewerker)",
+    category: categories.state,
     svg: agressionIcon,
-  } as Aspect;
+  } as Factor);
 
-  const meaning = {
-    score: [modZ(avgSignificance, 4.0, 1.0), modZ(avgSignificance, 4.0, 1.0)],
-    title: "Zingeving",
-    svg: meaningIcon,
-  } as Aspect;
-
-  const honesty = {
-    score: [modZ(avgFairness, 3.67, 1.0), modZ(avgFairness, 3.67, 1.0)],
-    title: "Eerlijkheid",
-    svg: honestyIcon,
-  } as Aspect;
-
-  const connection = {
-    score: [modZ(avgRelatedness, 3.33, 0.67), modZ(avgRelatedness, 3.33, 0.67)],
-    title: "Verbinding",
-    svg: connectionIcon,
-  } as Aspect;
-
-  const appreciation = {
-    score: [modZ(avgAppreciation, 4, 1), modZ(avgAppreciation, 4, 1)],
-    title: "Waardering",
-    svg: appreciationIcon,
-  } as Aspect;
-
-  const ptsd = {
-    score: [modZ(avgPtsdReexp, 2.67, 0.67), modZ(avgPtsdReexp, 2.67, 0.67)],
-    title: "PTSS herbeleving",
+  const ptsd = addTitleAndDescToFactor({
+    key: "ptsd",
+    score: [-modZ(avgPtsdReexp, 2.67, 0.67), -modZ(avgPtsdReexp, 2.67, 0.67)],
+    category: categories.state,
     svg: ptsdIcon,
-  } as Aspect;
+  } as Factor);
 
-  const victim = {
-    score: [modZ(avgVictim, 2.5, 1.5), modZ(avgVictim, 2.0, 1.0)], // Note: scores are different
-    title: "Slachtoffer of getuige van geweld",
+  const victim = addTitleAndDescToFactor({
+    key: "victim",
+    score: [-modZ(avgVictim, 2.5, 1.5), -modZ(avgVictim, 2.0, 1.0)], // Note: scores are different
+    category: categories.state,
     svg: victimIcon,
-  } as Aspect;
+  } as Factor);
 
-  const kindness = {
-    score: [modZ(avgAgreeable, 4.67, 0.33), modZ(avgAgreeable, 4.67, 0.33)],
-    title: "Vriendelijkheid",
-    svg: kindnessIcon,
-  } as Aspect;
-
-  const depression = {
+  const depression = addTitleAndDescToFactor({
+    key: "depression",
     score: [
-      modZ(avgDepressArousal, 2.4, 0.6),
-      modZ(avgDepressArousal, 2.4, 0.6),
+      -modZ(avgDepressArousal, 2.4, 0.6),
+      -modZ(avgDepressArousal, 2.4, 0.6),
     ],
-    title: "Neerslachtigheid",
+    category: categories.state,
     svg: depressionIcon,
-  } as Aspect;
+  } as Factor);
+
+  const meaning = addTitleAndDescToFactor({
+    key: "meaning",
+    score: [modZ(avgSignificance, 4.0, 1.0), modZ(avgSignificance, 4.0, 1.0)],
+    category: categories.needs,
+    svg: meaningIcon,
+  } as Factor);
+
+  const honesty = addTitleAndDescToFactor({
+    key: "honesty",
+    score: [modZ(avgFairness, 3.67, 1.0), modZ(avgFairness, 3.67, 1.0)],
+    category: categories.needs,
+    svg: honestyIcon,
+  } as Factor);
+
+  const connection = addTitleAndDescToFactor({
+    key: "connection",
+    score: [modZ(avgRelatedness, 3.33, 0.67), modZ(avgRelatedness, 3.33, 0.67)],
+    category: categories.needs,
+    svg: connectionIcon,
+  } as Factor);
+
+  const appreciation = addTitleAndDescToFactor({
+    key: "appreciation",
+    score: [modZ(avgAppreciation, 4, 1), modZ(avgAppreciation, 4, 1)],
+    category: categories.needs,
+    svg: appreciationIcon,
+  } as Factor);
+
+  const kindness = addTitleAndDescToFactor({
+    key: "kindness",
+    score: [modZ(avgKindness, 4.67, 0.33), modZ(avgKindness, 4.67, 0.33)],
+    category: categories.needs,
+    svg: kindnessIcon,
+  } as Factor);
 
   return {
     respondentId,
