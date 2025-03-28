@@ -74,7 +74,7 @@ export const EmojiScoreComponent: m.FactoryComponent<EmojiAttrs> = () => {
 
       return [
         m(
-          "svg",
+          "svg.unselectable",
           { width: size, height: size, viewBox: "0 0 1200 1600", style },
           m("path", {
             fill: fillColor,
@@ -83,7 +83,7 @@ export const EmojiScoreComponent: m.FactoryComponent<EmojiAttrs> = () => {
               emoji,
           })
         ),
-        // m("span", value.toFixed(1)),
+        // m("span", { }, value.toFixed(1)),
       ];
     },
   };

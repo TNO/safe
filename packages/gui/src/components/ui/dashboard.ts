@@ -6,9 +6,12 @@ import middleFinger from "../../assets/icons/noun-middle-finger-5029034.svg";
 import { EmojiScoreComponent } from "../ui/emoji";
 import { SlimdownView } from "mithril-ui-form";
 
-export const PhysicalAgression: FactoryComponent<{ score: number }> = () => {
+export const PhysicalAgression: FactoryComponent<{
+  score: number;
+  showScore?: boolean;
+}> = () => {
   return {
-    view: ({ attrs: { score } }) => {
+    view: ({ attrs: { score, showScore = false } }) => {
       return m(
         ".flex-item",
         {
@@ -19,7 +22,7 @@ export const PhysicalAgression: FactoryComponent<{ score: number }> = () => {
           },
         },
 
-        m("img", {
+        m("img.unselectable", {
           src: fist,
           alt: "Fysieke agressie",
           width: 130,
@@ -33,17 +36,31 @@ export const PhysicalAgression: FactoryComponent<{ score: number }> = () => {
             position: "absolute",
             bottom: "10px",
             left: "42px",
-            translate: "rotate(45deg)",
           },
-        })
+        }),
+        showScore &&
+          m(
+            "span",
+            {
+              style: {
+                position: "absolute",
+                bottom: "-5px",
+                left: "60px",
+              },
+            },
+            score.toFixed(1)
+          )
       );
     },
   };
 };
 
-export const NonPhysicalAgression: FactoryComponent<{ score: number }> = () => {
+export const NonPhysicalAgression: FactoryComponent<{
+  score: number;
+  showScore?: boolean;
+}> = () => {
   return {
-    view: ({ attrs: { score } }) => {
+    view: ({ attrs: { score, showScore = false } }) => {
       return m(
         ".flex-item",
         {
@@ -70,7 +87,19 @@ export const NonPhysicalAgression: FactoryComponent<{ score: number }> = () => {
             left: "42px",
             translate: "rotate(45deg)",
           },
-        })
+        }),
+        showScore &&
+          m(
+            "span",
+            {
+              style: {
+                position: "absolute",
+                bottom: "-5px",
+                left: "60px",
+              },
+            },
+            score.toFixed(1)
+          )
       );
     },
   };
@@ -131,6 +160,9 @@ export const Dashboard: FactoryComponent<{
       }, [] as Array<{ title: string; svgIcon: string; score1: number; score2: number; description: string; activity: string }>);
       // console.log(scoreItems);
 
+      // TODO Remove in production
+      const showScore = false; //true;
+
       return (
         scoreItems.length > 0 &&
         m(".row", [
@@ -162,7 +194,7 @@ export const Dashboard: FactoryComponent<{
                           ".flex-item",
                           // Title
                           m(
-                            "span",
+                            "span.unselectable",
                             {
                               style: {
                                 fontSize: "24px",
@@ -173,15 +205,15 @@ export const Dashboard: FactoryComponent<{
                             },
                             title
                           ),
-                          m("img", {
+                          m("img.unselectable", {
                             style:
                               "display: block; width: 70px; height: 70px; vertical-align: middle;",
                             src: svgIcon,
                           })
                         ),
 
-                        m(PhysicalAgression, { score: score1 }),
-                        m(NonPhysicalAgression, { score: score2 }),
+                        m(PhysicalAgression, { score: score1, showScore }),
+                        m(NonPhysicalAgression, { score: score2, showScore }),
                       ],
                       // ),
                     ]),

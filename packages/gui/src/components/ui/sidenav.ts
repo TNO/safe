@@ -96,14 +96,6 @@ export const SideNav: MeiosisComponent = () => {
           m(
             "li",
             m(FlatButton, {
-              label: t("CLEAR"),
-              iconName: "clear",
-              modalId: "clear_model",
-            })
-          ),
-          m(
-            "li",
-            m(FlatButton, {
               label: t("UPLOAD"),
               onclick: () => handleSelection("upload_csv", saveModel),
               iconName: "upload",
@@ -111,29 +103,37 @@ export const SideNav: MeiosisComponent = () => {
           ),
           m(
             "li",
-            m(Select, {
-              checkedId: role,
-              label: t("ROLE"),
-              iconName: roleIcon,
-              options: [
-                { id: "user", label: t("USER") },
-                { id: "editor", label: t("EDITOR") },
-                { id: "admin", label: t("ADMIN") },
-              ],
-              onchange: (role) => {
-                setRole(role[0]);
-              },
-            } as ISelectOptions<UserRole>)
-          ),
-          m(
-            "li",
-            m(LanguageSwitcher, {
-              onLanguageChange: async (language: Languages) => {
-                await i18n.loadAndSetLocale(language as Languages);
-              },
-              currentLanguage: i18n.currentLocale,
+            m(FlatButton, {
+              label: t("CLEAR"),
+              iconName: "clear",
+              modalId: "clear_model",
             })
           ),
+          // m(
+          //   "li",
+          //   m(Select, {
+          //     checkedId: role,
+          //     label: t("ROLE"),
+          //     iconName: roleIcon,
+          //     options: [
+          //       { id: "user", label: t("USER") },
+          //       { id: "editor", label: t("EDITOR") },
+          //       { id: "admin", label: t("ADMIN") },
+          //     ],
+          //     onchange: (role) => {
+          //       setRole(role[0]);
+          //     },
+          //   } as ISelectOptions<UserRole>)
+          // ),
+          // m(
+          //   "li",
+          //   m(LanguageSwitcher, {
+          //     onLanguageChange: async (language: Languages) => {
+          //       await i18n.loadAndSetLocale(language as Languages);
+          //     },
+          //     currentLanguage: i18n.currentLocale,
+          //   })
+          // ),
         ]
         // m(ModalPanel, {
         //   id: 'clear_model',
