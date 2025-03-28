@@ -15,7 +15,7 @@ const devMode = (process.env as any).NODE_ENV === "development";
 const isProduction = !devMode;
 const outputPath = resolve(process.cwd(), isProduction ? "../../docs" : "dist");
 const SERVER = process.env.SERVER || "localhost";
-const publicPath = isProduction ? "https://github.io/TNO/COMPASS" : "";
+const publicPath = isProduction ? "https://tno.github.io/compass" : "";
 const APP_TITLE = "COA COMPASS";
 const APP_DESC =
   "Tool voor de evaluatie van het gedrag van bewoners van COA centra";
