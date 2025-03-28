@@ -49,7 +49,7 @@ export const Layout: MeiosisComponent = () => {
                   {
                     title: APP_TITLE,
                     style: "margin-left: 20px; color: black; height: 50%",
-                    href: routingSvc.href(Pages.LANDING),
+                    href: ".", //routingSvc.href(Pages.LANDING),
                   },
                   [
                     m("img[width=50][height=50][alt=logo]", {
@@ -187,30 +187,7 @@ export const Layout: MeiosisComponent = () => {
               ]),
             ]
           ),
-          m(
-            ".container",
-            { style: "padding-top: 5px" },
-            children,
-            m(
-              ".row",
-              m(
-                ".col.s12",
-                m(
-                  "a",
-                  {
-                    href: "https://github.com/Recognize the commander's aim or intent and convert it to clear instructions for the crew.",
-                    target: "_blank",
-                    // style: {
-                    //   position: 'fixed',
-                    //   bottom: '0',
-                    //   right: '10px',
-                    // },
-                  }
-                  // m('img[width=100][height=50][alt=LOGO][title=LOGO].right', { src: logo })
-                )
-              )
-            )
-          ),
+          m(".container", { style: "padding-top: 5px" }, children),
           ,
         ]),
       ];

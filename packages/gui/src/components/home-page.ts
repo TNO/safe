@@ -124,27 +124,22 @@ export const Stats: FactoryComponent<{ data: UserEntry }> = () => {
 };
 
 export const HomePage: MeiosisComponent = () => {
-  let userIdOptions: IInputOption<string | number>[];
-
   return {
     oninit: ({
       attrs: {
-        state: {
-          model: { data = [] },
-        },
         actions: { setPage },
       },
     }) => {
-      userIdOptions = data.map((d) => ({
-        id: d.uniqueCode,
-        label: `${d.uniqueCode} (${d.status})`,
-      }));
       setPage(Pages.HOME);
     },
     view: ({ attrs: { state, actions } }) => {
       const { model = EmptyDataModel(), selectedId, showAllFactors } = state;
       const { data = [] } = model;
       // data.sort((a, b) => (a.date > b.date ? -1 : 1));
+      const userIdOptions = data.map((d) => ({
+        id: d.uniqueCode,
+        label: `${d.uniqueCode} (${d.status})`,
+      }));
 
       const filteredData = selectedId
         ? data
