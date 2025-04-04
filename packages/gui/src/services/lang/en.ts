@@ -27,6 +27,7 @@ export const messages = {
   LANGUAGE: "Language",
   CLEAR: "Clear data",
   UPLOAD: "Upload CSV",
+  DOWNLOAD: "Download CSV",
   ROLE: "Role",
   LINK: "Link",
   PERMALINK: "Permalink",

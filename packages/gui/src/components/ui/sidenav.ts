@@ -13,6 +13,7 @@ import {
 import { FlatButton, ModalPanel } from "mithril-materialized";
 import { DataModel, Page, Pages, EmptyDataModel } from "../../models";
 import { isActivePage } from "../../utils";
+import Papa from "papaparse";
 
 const createPermalink = (model: DataModel) => {
   const permLink = document.createElement("input") as HTMLInputElement;
@@ -45,7 +46,8 @@ const createPermalink = (model: DataModel) => {
   }
 };
 
-function getModelParameter(param = "model"): string | null {
+/** Get a query parameter from the URL */
+function getQueryParameter(param = "model"): string | null {
   // 1. Get the full query string from the current URL (e.g., "?model=X1&year=2024")
   const queryString = window.location.search;
 
@@ -59,8 +61,9 @@ function getModelParameter(param = "model"): string | null {
   return modelValue;
 }
 
+/** Convert a model base64 encoded string to the data model */
 const usePermalink = (saveModel: (model: DataModel) => void) => {
-  const uriModel = getModelParameter();
+  const uriModel = getQueryParameter();
   if (!uriModel) {
     return;
   }
@@ -78,8 +81,9 @@ const usePermalink = (saveModel: (model: DataModel) => void) => {
 
 export const SideNav: MeiosisComponent = () => {
   const handleSelection = (
-    option: string,
-    saveModel: (model: DataModel) => void
+    option: "clear" | "upload_csv" | "download_csv",
+    saveModel: (model: DataModel) => void,
+    model: DataModel
   ) => {
     switch (option) {
       case "clear":
@@ -92,6 +96,27 @@ export const SideNav: MeiosisComponent = () => {
         fileInput.accept = ".csv";
         fileInput.onchange = handleCsvUpload(saveModel);
         fileInput.click();
+        break;
+      }
+      case "download_csv": {
+        const dlAnchorElem = document.createElement("a"); // Use 'a' tag instead of 'anchor'
+        if (!dlAnchorElem) {
+          return;
+        }
+
+        const dataStr =
+          "data:text/csv;charset=utf-8," +
+          encodeURIComponent(
+            Papa.unparse(model.data, { header: true, delimiter: ";" })
+          );
+
+        dlAnchorElem.href = dataStr; // Use href property instead of setAttribute
+        dlAnchorElem.download = `COA_COMPASS_samengevoegd.csv`; // Use download property instead of setAttribute
+        dlAnchorElem.target = "_blank"; // Use target property instead of setAttribute
+
+        document.body.appendChild(dlAnchorElem); // Append to the document so the click works
+        dlAnchorElem.click();
+        document.body.removeChild(dlAnchorElem); // Clean up the element
         break;
       }
     }
@@ -161,8 +186,16 @@ export const SideNav: MeiosisComponent = () => {
             "li",
             m(FlatButton, {
               label: t("UPLOAD"),
-              onclick: () => handleSelection("upload_csv", saveModel),
+              onclick: () => handleSelection("upload_csv", saveModel, model),
               iconName: "upload",
+            })
+          ),
+          m(
+            "li",
+            m(FlatButton, {
+              label: t("DOWNLOAD"),
+              onclick: () => handleSelection("download_csv", saveModel, model),
+              iconName: "download",
             })
           ),
           m(

@@ -29,6 +29,7 @@ export const messagesNL: typeof messages = {
   LANGUAGE: "Taal",
   CLEAR: "Wis data",
   UPLOAD: "Lees CSV",
+  DOWNLOAD: "Download CSV",
   ROLE: "Rol",
   MODEL: "Model",
   TITLE: "Titel",
