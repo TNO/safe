@@ -12,6 +12,7 @@ import {
 import { ISelectOptions, Select, Tabs } from "mithril-materialized";
 import { Dashboard } from "./ui/dashboard";
 import silenceIcon from "../assets/icons/noun-silence-237457.svg";
+import { interviewQuestionnaire, RespondentType } from "../services/csv/index";
 
 export const Questionnaire: FactoryComponent<{ data: UserEntry[] }> = () => {
   return {
@@ -24,7 +25,11 @@ export const Questionnaire: FactoryComponent<{ data: UserEntry[] }> = () => {
           m("th", `Vraag`),
           data.map((d) => m("th", `${d.endDate || d.startDate} (${d.status})`))
         ),
-        Object.entries(questionnaire).map(([key, question]) =>
+        Object.entries(
+          data[0].respondentType === RespondentType.INTERVIEWER
+            ? interviewQuestionnaire
+            : questionnaire
+        ).map(([key, question]) =>
           m(
             "tr",
             m("td", question),
@@ -32,8 +37,8 @@ export const Questionnaire: FactoryComponent<{ data: UserEntry[] }> = () => {
               m(
                 "td",
                 likertScaleProp.includes(key)
-                  ? likertToText(d[key] as LikertScale)
-                  : d[key] ?? ""
+                  ? likertToText(d[key as keyof UserEntry] as LikertScale)
+                  : d[key as keyof UserEntry] ?? ""
               )
             )
           )

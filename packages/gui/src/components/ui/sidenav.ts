@@ -94,7 +94,7 @@ export const SideNav: MeiosisComponent = () => {
         const fileInput = document.createElement("input");
         fileInput.type = "file";
         fileInput.accept = ".csv";
-        fileInput.onchange = handleCsvUpload(saveModel);
+        fileInput.onchange = handleCsvUpload(saveModel, model);
         fileInput.click();
         break;
       }

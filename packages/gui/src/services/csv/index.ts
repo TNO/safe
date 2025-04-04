@@ -14,7 +14,11 @@ import connectionIcon from "../../assets/icons/noun-holding-hands-6084035.svg";
 import appreciationIcon from "../../assets/icons/noun-appreciation-7592051.svg";
 import kindnessIcon from "../../assets/icons/noun-kindness-6014284.svg";
 import { explanations } from "./explanations";
-import { headerMapping } from "./questionnaire";
+import {
+  headerMapping,
+  interviewQuestionnaire,
+  questionnaire,
+} from "./questionnaire";
 
 export type LikertScale = 0 | 1 | 2 | 3 | 4 | 5;
 
@@ -58,32 +62,41 @@ export const likertScaleProp = [
   "senseOfPurpose",
   "meaningfulActivities",
   "violenceNeverAcceptable",
-  "acceptableViolenceSituations",
-  "selfDefenseAllowed",
-  "drugUseForMood",
-  "sleepOrMedicationForMood",
-  "alcoholUseForMood",
-  "frequencyOfPhysicalViolence",
+  "violAccept",
+  "selfDef",
+  "drugUse",
+  "sleepMeds",
+  "alcohol",
+  "freqPhysViol",
   "selfOccupancy",
-  "sufficientActivities",
+  "sufAct",
   "dailyVariation",
-  "fairTreatmentInAzc",
-  "influenceOnRulesAndAppointments",
+  "fairTreatment",
+  "influence",
   "coerceOthers",
-  "rigidWaysOfDoingThings",
-  "ordersOthersToFollowMe",
-  "rudeTowardsOthers",
-  "capacityForForgiveness",
-  "attentiveAndKind",
+  "myWay",
+  "followMe",
+  "rude",
+  "forgiving",
+  "kind",
   "controlOverAnger",
-  "perceivedAsImpulsive",
-  "dominatedByAnger",
-  "threateningBodyLanguage",
-  "insultingLanguage",
-  "deceptionForPersonalGain",
-  "frequencyOfThreateningBodyLanguage",
-  "frequencyOfInsultingLanguage",
-  "frequencyOfDeceptionForPersonalGain",
+  "impulsive",
+  "angry",
+  "threatening",
+  "insulting",
+  "deceptive",
+  "freqThreatBL",
+  "freqInsults",
+  "freqDecept",
+  "compentency1",
+  "compentency2",
+  "compentency3",
+  "autonomy1",
+  "autonomy2",
+  "autonomy3",
+  "hostile1",
+  "hostile2",
+  "hostile3",
 ];
 
 export type UserLikertAnswers = {
@@ -111,36 +124,52 @@ export type UserLikertAnswers = {
   senseOfPurpose: LikertScale;
   meaningfulActivities: LikertScale;
   violenceNeverAcceptable: LikertScale;
-  acceptableViolenceSituations: LikertScale;
-  selfDefenseAllowed: LikertScale;
-  drugUseForMood: LikertScale;
-  sleepOrMedicationForMood: LikertScale;
-  alcoholUseForMood: LikertScale;
-  frequencyOfPhysicalViolence: LikertScale;
+  violAccept: LikertScale;
+  selfDef: LikertScale;
+  drugUse: LikertScale;
+  sleepMeds: LikertScale;
+  alcohol: LikertScale;
+  freqPhysViol: LikertScale;
   selfOccupancy: LikertScale;
-  sufficientActivities: LikertScale;
+  sufAct: LikertScale;
   dailyVariation: LikertScale;
-  fairTreatmentInAzc: LikertScale;
-  influenceOnRulesAndAppointments: LikertScale;
+  fairTreatment: LikertScale;
+  influence: LikertScale;
   coerceOthers: LikertScale;
-  rigidWaysOfDoingThings: LikertScale;
-  ordersOthersToFollowMe: LikertScale;
-  rudeTowardsOthers: LikertScale;
-  capacityForForgiveness: LikertScale;
-  attentiveAndKind: LikertScale;
+  myWay: LikertScale;
+  followMe: LikertScale;
+  rude: LikertScale;
+  forgiving: LikertScale;
+  kind: LikertScale;
   controlOverAnger: LikertScale;
-  perceivedAsImpulsive: LikertScale;
-  dominatedByAnger: LikertScale;
-  threateningBodyLanguage: LikertScale;
-  insultingLanguage: LikertScale;
-  deceptionForPersonalGain: LikertScale;
-  frequencyOfThreateningBodyLanguage: LikertScale;
-  frequencyOfInsultingLanguage: LikertScale;
-  frequencyOfDeceptionForPersonalGain: LikertScale;
+  impulsive: LikertScale;
+  angry: LikertScale;
+  threatening: LikertScale;
+  insulting: LikertScale;
+  deceptive: LikertScale;
+  freqThreatBL: LikertScale;
+  freqInsults: LikertScale;
+  freqDecept: LikertScale;
+  compentency1: LikertScale;
+  compentency2: LikertScale;
+  compentency3: LikertScale;
+  autonomy1: LikertScale;
+  autonomy2: LikertScale;
+  autonomy3: LikertScale;
+  hostile1: LikertScale;
+  hostile2: LikertScale;
+  hostile3: LikertScale;
 };
+
+export enum RespondentType {
+  USER = 1,
+  INTERVIEWER = 2,
+  STAFF = 4,
+}
 
 // Define your expected interface
 export type UserEntry = Partial<UserLikertAnswers> & {
+  respondentType?: RespondentType;
   respondentId?: number;
   startDate?: string;
   startTime?: string;
@@ -155,11 +184,15 @@ export type UserEntry = Partial<UserLikertAnswers> & {
   endDate?: string;
   status?: string;
   gender?: string;
+  /** Did you receive help while filling out the questionnaire */
+  recHelp?: string;
+  /** Did you receive any information from the COA staff w.r.t. this questionnaire */
+  info?: string;
   age?: number | string;
   azcMonths?: number | string;
-  consentToBegeleiderViewing?: string;
+  informedConsent?: string;
   uniqueCode?: string | number;
-  [questionId: string]: number | string | undefined; // question IDs will map to numbers
+  // [questionId: string]: number | string | undefined; // question IDs will map to numbers
 };
 
 export type UserScore = {
@@ -561,27 +594,27 @@ export const userEntryToScore = (entry: UserEntry): UserScore => {
     // drugUseForMood = 0,
     // sleepOrMedicationForMood = 0,
     // alcoholUseForMood = 0,
-    frequencyOfPhysicalViolence = 0,
+    freqPhysViol: frequencyOfPhysicalViolence = 0,
     // selfOccupancy = 0,
     // sufficientActivities = 0,
     // dailyVariation = 0,
-    fairTreatmentInAzc = 0,
-    influenceOnRulesAndAppointments = 0,
+    fairTreatment: fairTreatmentInAzc = 0,
+    influence: influenceOnRulesAndAppointments = 0,
     // coerceOthers = 0,
     // rigidWaysOfDoingThings = 0,
     // ordersOthersToFollowMe = 0,
-    rudeTowardsOthers = 0,
-    capacityForForgiveness = 0,
-    attentiveAndKind = 0,
+    rude: rudeTowardsOthers = 0,
+    forgiving: capacityForForgiveness = 0,
+    kind: attentiveAndKind = 0,
     // controlOverAnger = 0,
     // perceivedAsImpulsive = 0, // Negative trait
     // dominatedByAnger = 0, // Negative trait
-    threateningBodyLanguage = 0,
-    insultingLanguage = 0,
-    deceptionForPersonalGain = 0,
-    frequencyOfThreateningBodyLanguage = 0,
-    frequencyOfInsultingLanguage = 0,
-    frequencyOfDeceptionForPersonalGain = 0,
+    threatening: threateningBodyLanguage = 0,
+    insulting: insultingLanguage = 0,
+    deceptive: deceptionForPersonalGain = 0,
+    freqThreatBL: frequencyOfThreateningBodyLanguage = 0,
+    freqInsults: frequencyOfInsultingLanguage = 0,
+    freqDecept: frequencyOfDeceptionForPersonalGain = 0,
   } = entry;
 
   const avgSignificance = avg(
@@ -802,6 +835,26 @@ export async function processCSV(file: File): Promise<UserEntry[]> {
     );
   }
 
+  function determineRespondentType(
+    row: Record<string, string | number>
+  ): RespondentType {
+    const respondentType = row["respondentType"] as string;
+    if (respondentType) return parseInt(respondentType) as RespondentType;
+    if (row["respondentType"] === "interviewer") {
+      return RespondentType.INTERVIEWER;
+    }
+    if (
+      typeof row[interviewQuestionnaire.lifeMeaningful as string] !==
+      "undefined"
+    ) {
+      return RespondentType.INTERVIEWER;
+    }
+    if (typeof row[questionnaire.lifeMeaningful as string] !== "undefined") {
+      return RespondentType.USER;
+    }
+    return RespondentType.STAFF;
+  }
+
   return new Promise((resolve, reject) => {
     Papa.parse<Record<string, string | number>>(file, {
       header: true,
@@ -811,17 +864,18 @@ export async function processCSV(file: File): Promise<UserEntry[]> {
         // Process the data
         const processedData: UserEntry[] = results.data.map((row) => {
           let date = Date.now();
-          let endDate = (row["Eind datum"] || row["Start datum"]) as string;
-          console.log(endDate);
+          let startDate = row["Start datum"] as string;
+          console.log(startDate);
           try {
-            const d = convertDDMMYYYYToDate(endDate);
+            const d = convertDDMMYYYYToDate(startDate);
             if (d) {
               date = d.valueOf();
             }
           } catch {
-            console.error("Invalid date", endDate);
+            console.error("Invalid date", startDate);
           }
           const entry = {
+            respondentType: determineRespondentType(row),
             date,
             questionCnt: 0,
             answeredCnt: 0,
@@ -846,7 +900,7 @@ export async function processCSV(file: File): Promise<UserEntry[]> {
             } else if (answer) {
               entry.answeredCnt!++;
             }
-            entry[questionId] = answer;
+            (entry[questionId] as unknown) = answer;
           });
           return entry;
         });
@@ -858,16 +912,67 @@ export async function processCSV(file: File): Promise<UserEntry[]> {
   });
 }
 
+const mergeEntries = (
+  entries: UserEntry[],
+  newEntry: UserEntry
+): UserEntry[] => {
+  if (!newEntry.uniqueCode) {
+    console.error("New entry does not have a unique code");
+    return entries;
+  }
+  // Check if the new entry already exists in the list
+  const existingEntryIndex = entries.findIndex(
+    (entry) => entry.uniqueCode === newEntry.uniqueCode
+  );
+  if (existingEntryIndex !== -1) {
+    // Merge the new entry with the existing one
+    const existingEntry = entries[existingEntryIndex];
+    const date = Math.max(existingEntry.date!, newEntry.date!);
+    const respondentType = Math.min(
+      existingEntry.respondentType || 1,
+      newEntry.respondentType || 1
+    );
+    const mergedEntry = {
+      ...existingEntry,
+      ...newEntry,
+      date,
+      respondentType,
+      questionCnt:
+        (existingEntry.questionCnt || 0) + (newEntry.questionCnt || 0),
+      answeredCnt:
+        (existingEntry.answeredCnt || 0) + (newEntry.answeredCnt || 0),
+      declinedCnt:
+        (existingEntry.declinedCnt || 0) + (newEntry.declinedCnt || 0),
+    };
+    entries[existingEntryIndex] = mergedEntry;
+  } else {
+    // Add the new entry to the list
+    entries.push(newEntry);
+  }
+  return entries;
+};
+
 export const handleCsvUpload =
-  (saveModel: (model: DataModel) => void) => async (e: Event) => {
+  (
+    saveModel: (model: DataModel) => void,
+    model = {
+      version: 0,
+      lastUpdate: Date.now(),
+      data: [],
+    } as DataModel
+  ) =>
+  async (e: Event) => {
     const fileInput = e.target as HTMLInputElement;
     if (!fileInput.files || fileInput.files.length <= 0) return;
 
-    let model = {
-      version: 1,
-      lastUpdate: Date.now(),
-      data: [],
-    } as DataModel;
-    model.data = await processCSV(fileInput.files[0]);
+    model.version++;
+    model.lastUpdate = Date.now();
+
+    const csv = await processCSV(fileInput.files[0]);
+    const existingData = model.data || [];
+    model.data =
+      existingData.length === 0
+        ? csv
+        : csv.reduce((acc, entry) => mergeEntries(acc, entry), existingData);
     saveModel(model);
   };

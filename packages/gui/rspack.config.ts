@@ -66,7 +66,11 @@ const configuration: Configuration = {
     new LightningCssMinimizerRspackPlugin(),
     new SwcJsMinimizerRspackPlugin({
       minimizerOptions: devMode
-        ? {}
+        ? {
+            compress: false,
+            minify: false,
+            mangle: false,
+          }
         : {
             compress: true,
             minify: true,
