@@ -1,23 +1,80 @@
 import m from "mithril";
 import M from "materialize-css";
 import {
-  Languages,
   MeiosisComponent,
-  UserRole,
   handleCsvUpload,
-  i18n,
   routingSvc,
   t,
 } from "../../services";
 import {
-  FlatButton,
-  ISelectOptions,
-  ModalPanel,
-  Select,
-} from "mithril-materialized";
+  compressToEncodedURIComponent,
+  decompressFromEncodedURIComponent,
+} from "lz-string";
+import { FlatButton, ModalPanel } from "mithril-materialized";
 import { DataModel, Page, Pages, EmptyDataModel } from "../../models";
 import { isActivePage } from "../../utils";
-import { LanguageSwitcher } from "./language-switcher";
+
+const createPermalink = (model: DataModel) => {
+  const permLink = document.createElement("input") as HTMLInputElement;
+  document.body.appendChild(permLink);
+  if (!permLink) {
+    return;
+  }
+  const compressed = compressToEncodedURIComponent(JSON.stringify(model));
+  const url = `${window.location.href}${
+    /\?/.test(window.location.href) ? "&" : "?"
+  }model=${compressed}`;
+  permLink.value = url;
+  permLink.select();
+  permLink.setSelectionRange(0, 999999); // For mobile devices
+  try {
+    const successful = document.execCommand("copy");
+    if (successful) {
+      M.toast({
+        html: t("PERMALINK_MSG"),
+        classes: "yellow black-text",
+      });
+    }
+  } catch (err) {
+    M.toast({
+      html: "Failed copying link to clipboard: " + err,
+      classes: "red",
+    });
+  } finally {
+    document.body.removeChild(permLink);
+  }
+};
+
+function getModelParameter(param = "model"): string | null {
+  // 1. Get the full query string from the current URL (e.g., "?model=X1&year=2024")
+  const queryString = window.location.search;
+
+  // 2. Create a URLSearchParams object from the query string
+  const urlParams = new URLSearchParams(queryString);
+
+  // 3. Get the value of the 'model' parameter
+  // The return type is string | null (if the parameter doesn't exist)
+  const modelValue = urlParams.get(param);
+
+  return modelValue;
+}
+
+const usePermalink = (saveModel: (model: DataModel) => void) => {
+  const uriModel = getModelParameter();
+  if (!uriModel) {
+    return;
+  }
+  try {
+    const decompressed = decompressFromEncodedURIComponent(uriModel);
+    if (!decompressed) {
+      return;
+    }
+    const model = JSON.parse(decompressed);
+    saveModel(model);
+  } catch (err) {
+    console.error(err);
+  }
+};
 
 export const SideNav: MeiosisComponent = () => {
   const handleSelection = (
@@ -41,19 +98,26 @@ export const SideNav: MeiosisComponent = () => {
   };
 
   return {
+    oninit: ({
+      attrs: {
+        actions: { saveModel },
+      },
+    }) => {
+      usePermalink(saveModel);
+    },
     view: ({
       attrs: {
         state,
-        actions: { saveModel, setRole, changePage },
+        actions: { saveModel, changePage },
       },
     }) => {
-      const { role, page } = state;
-      const roleIcon =
-        role === "user"
-          ? "person"
-          : role === "editor"
-          ? "edit"
-          : "manage_accounts";
+      const { page, model } = state;
+      // const roleIcon =
+      //   role === "user"
+      //     ? "person"
+      //     : role === "editor"
+      //     ? "edit"
+      //     : "manage_accounts";
 
       const isActive = isActivePage(page);
 
@@ -99,6 +163,14 @@ export const SideNav: MeiosisComponent = () => {
               label: t("UPLOAD"),
               onclick: () => handleSelection("upload_csv", saveModel),
               iconName: "upload",
+            })
+          ),
+          m(
+            "li",
+            m(FlatButton, {
+              label: t("PERMALINK"),
+              onclick: () => createPermalink(model),
+              iconName: "link",
             })
           ),
           m(

@@ -29,6 +29,8 @@ export const messages = {
   UPLOAD: "Upload CSV",
   ROLE: "Role",
   LINK: "Link",
+  PERMALINK: "Permalink",
+  PERMALINK_MSG: "Copied permanent link to clipboard",
   MODEL: "Model",
   TITLE: "Title",
   AUTHORS: "Authors",

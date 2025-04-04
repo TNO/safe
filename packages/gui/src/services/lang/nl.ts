@@ -34,6 +34,9 @@ export const messagesNL: typeof messages = {
   TITLE: "Titel",
   AUTHORS: "Auteurs",
   LINK: "Link",
+  PERMALINK: "Permalink",
+  PERMALINK_MSG:
+    "Een permanente link naar dit model werd gekopieerd naar het clipboard.",
   TYPE: "Type",
   HITS: "Hits",
   NO_DATA_MSG: {
