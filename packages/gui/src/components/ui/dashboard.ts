@@ -1,19 +1,25 @@
 import m, { FactoryComponent } from "mithril";
 import { UserEntry, userEntryToScore } from "../../services";
 import { Collapsible, InputCheckbox } from "mithril-materialized";
-import fist from "../../assets/icons/noun-fist-hand-5029035.svg";
-import middleFinger from "../../assets/icons/noun-middle-finger-5029034.svg";
+import physAgres from "../../assets/icons/physical_agression.svg";
+import bodyLang from "../../assets/icons/noun-angry-expression-7476146.svg";
 import { EmojiScoreComponent } from "../ui/emoji";
 import { SlimdownView } from "mithril-ui-form";
 
-export const PhysicalAgression: FactoryComponent<{
+type AgressionAttr = {
   score: number;
+  moreIsBetter?: boolean;
   showScore?: boolean;
-}> = () => {
+  fillColor?: string;
+};
+
+export const PhysicalAgression: FactoryComponent<AgressionAttr> = () => {
   return {
-    view: ({ attrs: { score, showScore = false } }) => {
+    view: ({
+      attrs: { score, fillColor, showScore = false, moreIsBetter },
+    }) => {
       return m(
-        ".flex-item",
+        ".flex-item.tooltip",
         {
           style: {
             position: "relative",
@@ -23,46 +29,40 @@ export const PhysicalAgression: FactoryComponent<{
         },
 
         m("img.unselectable", {
-          src: fist,
+          src: physAgres,
           alt: "Fysieke agressie",
           width: 130,
           height: 130,
-          style: { opacity: 0.08 },
+          style: { opacity: 0.15 },
         }),
         m(EmojiScoreComponent, {
           value: score,
+          moreIsBetter,
           size: 70,
+          fillColor,
           style: {
             position: "absolute",
             bottom: "10px",
-            left: "42px",
+            left: "55px",
+            opacity: 0.9,
           },
         }),
-        showScore &&
-          m(
-            "span",
-            {
-              style: {
-                position: "absolute",
-                bottom: "-5px",
-                left: "60px",
-              },
-            },
-            score.toFixed(1)
-          )
+        m(
+          "span.tooltiptext",
+          `Fysieke agressie ${showScore ? `(${score.toFixed(1)})` : ""}`
+        )
       );
     },
   };
 };
 
-export const NonPhysicalAgression: FactoryComponent<{
-  score: number;
-  showScore?: boolean;
-}> = () => {
+export const NonPhysicalAgression: FactoryComponent<AgressionAttr> = () => {
   return {
-    view: ({ attrs: { score, showScore = false } }) => {
+    view: ({
+      attrs: { score, fillColor, showScore = false, moreIsBetter },
+    }) => {
       return m(
-        ".flex-item",
+        ".flex-item.tooltip",
         {
           style: {
             position: "relative",
@@ -72,34 +72,28 @@ export const NonPhysicalAgression: FactoryComponent<{
         },
 
         m("img", {
-          src: middleFinger,
+          src: bodyLang,
           alt: "Niet fysieke agressie",
           width: 130,
           height: 130,
-          style: { opacity: 0.08 },
+          style: { opacity: 0.15 },
         }),
         m(EmojiScoreComponent, {
           value: score,
+          moreIsBetter,
           size: 70,
+          fillColor,
           style: {
             position: "absolute",
             bottom: "10px",
             left: "42px",
-            translate: "rotate(45deg)",
+            opacity: 0.9,
           },
         }),
-        showScore &&
-          m(
-            "span",
-            {
-              style: {
-                position: "absolute",
-                bottom: "-5px",
-                left: "60px",
-              },
-            },
-            score.toFixed(1)
-          )
+        m(
+          "span.tooltiptext",
+          `Niet-fysieke agressie ${showScore ? `(${score.toFixed(1)})` : ""}`
+        )
       );
     },
   };
@@ -113,7 +107,7 @@ export const Dashboard: FactoryComponent<{
   return {
     view: ({ attrs: { data, showAllFactors = false, update } }) => {
       const scores = data.map(userEntryToScore);
-      console.log(scores);
+      console.table({ scores });
       const scoreItems = scores.reduce((acc, s) => {
         const {
           agressionResidentsView,
@@ -139,29 +133,18 @@ export const Dashboard: FactoryComponent<{
             connection,
             appreciation,
             kindness,
-          ].map(({ title, svg, score, desc, activity }) => ({
-            title,
+          ].map(({ svg, score, ...params }) => ({
+            ...params,
             svgIcon: svg,
             score1: score[0],
             score2: score[1],
-            description: desc
-              ? desc[0] !== desc[1]
-                ? desc.join(" ")
-                : desc[0]
-              : "",
-            activity: activity
-              ? activity[0] !== activity[1]
-                ? activity.join(" ")
-                : activity[0]
-              : "",
           }))
         );
         return acc;
-      }, [] as Array<{ title: string; svgIcon: string; score1: number; score2: number; description: string; activity: string }>);
-      // console.log(scoreItems);
+      }, [] as Array<{ title: string; svgIcon: string; score1: number; score2: number; colors?: [string, string]; desc?: [string, string]; activity?: [string, string]; moreIsBetter?: boolean; category?: string; notAnsweredPerc?: number }>);
 
       // TODO Remove in production
-      const showScore = false; //true;
+      const showScore = true; //true;
 
       return (
         scoreItems.length > 0 &&
@@ -186,7 +169,26 @@ export const Dashboard: FactoryComponent<{
                   Math.abs(i.score2) >= 1
               )
               .map(
-                ({ title, svgIcon, score1, score2, description, activity }) => {
+                ({
+                  title,
+                  svgIcon,
+                  score1,
+                  score2,
+                  colors,
+                  desc,
+                  activity,
+                  moreIsBetter,
+                  category,
+                  notAnsweredPerc = 0,
+                }) => {
+                  const explanation =
+                    notAnsweredPerc === 100
+                      ? "Geen enkele vraag werd beantwoord, dus probeer met de bewoner te bespreken wat de reden hiervan is."
+                      : desc?.filter(Boolean).join("\n\n<hr/>\n");
+                  const activityDesc =
+                    notAnsweredPerc === 100
+                      ? undefined
+                      : activity?.filter(Boolean).join("\n\n<hr/>\n");
                   return {
                     header: m(".flex-container", [
                       [
@@ -205,15 +207,57 @@ export const Dashboard: FactoryComponent<{
                             },
                             title
                           ),
+                          notAnsweredPerc > 20 &&
+                            m(
+                              "span.tooltip",
+                              m(
+                                "span.tooltiptext",
+                                notAnsweredPerc === 100
+                                  ? "Geen enkele vraag werd beantwoord!"
+                                  : `${notAnsweredPerc}% van de vragen niet beantwoord!`
+                              ),
+                              m(
+                                "i.material-icons",
+                                {
+                                  style: {
+                                    color: "red",
+                                    verticalAlign: "middle",
+                                    marginBottom: "-6px",
+                                  },
+                                },
+                                "warning"
+                              )
+                            ),
                           m("img.unselectable", {
                             style:
-                              "display: block; width: 70px; height: 70px; vertical-align: middle;",
+                              "display: block; width: 90px; height: 90px; vertical-align: middle;",
                             src: svgIcon,
-                          })
+                          }),
+                          category &&
+                            m(
+                              "span",
+                              {
+                                style: {
+                                  fontSize: "10pt",
+                                  fontStyle: "italic",
+                                },
+                              },
+                              `Categorie: ${category}`
+                            )
                         ),
 
-                        m(PhysicalAgression, { score: score1, showScore }),
-                        m(NonPhysicalAgression, { score: score2, showScore }),
+                        m(PhysicalAgression, {
+                          score: score1,
+                          moreIsBetter,
+                          showScore,
+                          fillColor: colors ? colors[0] : undefined,
+                        }),
+                        m(NonPhysicalAgression, {
+                          score: score2,
+                          moreIsBetter,
+                          showScore,
+                          fillColor: colors ? colors[1] : undefined,
+                        }),
                       ],
                       // ),
                     ]),
@@ -221,16 +265,16 @@ export const Dashboard: FactoryComponent<{
                       ".row",
                       m(
                         ".col.s12.m6",
-                        description &&
+                        explanation &&
                           m(SlimdownView, {
-                            md: "### Wat betekent dit?\n\n" + description,
+                            md: "### Wat betekent dit?\n\n" + explanation,
                           })
                       ),
                       m(
                         ".col.s12.m6",
-                        activity &&
+                        activityDesc &&
                           m(SlimdownView, {
-                            md: "### Wat kan ik doen?\n\n" + activity,
+                            md: "### Wat kan ik doen?\n\n" + activityDesc,
                           })
                       )
                     ),

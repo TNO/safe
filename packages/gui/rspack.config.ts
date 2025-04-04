@@ -4,7 +4,6 @@ import {
   type Configuration,
   DefinePlugin,
   HtmlRspackPlugin,
-  HotModuleReplacementPlugin,
   SwcJsMinimizerRspackPlugin,
   LightningCssMinimizerRspackPlugin,
 } from "@rspack/core";
@@ -64,7 +63,6 @@ const configuration: Configuration = {
         "og:image:height": "200",
       },
     }),
-    new HotModuleReplacementPlugin(),
     new LightningCssMinimizerRspackPlugin(),
     new SwcJsMinimizerRspackPlugin({
       minimizerOptions: devMode

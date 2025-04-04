@@ -26,6 +26,8 @@ const colors = {
 export interface EmojiAttrs {
   value: number;
   size?: number;
+  fillColor?: string;
+  moreIsBetter?: boolean;
   limits?: {
     veryNegative: number;
     negative: number;
@@ -43,6 +45,8 @@ export const EmojiScoreComponent: m.FactoryComponent<EmojiAttrs> = () => {
         value,
         size = 100,
         style,
+        fillColor,
+        moreIsBetter = true,
         limits = {
           veryNegative: -2,
           negative: -1,
@@ -53,23 +57,24 @@ export const EmojiScoreComponent: m.FactoryComponent<EmojiAttrs> = () => {
 
       // Determine emoji and gradient based on value
       let emoji: string;
-      let fillColor: string;
+      let fill: string;
+      const val = moreIsBetter ? value : -value;
 
-      if (value <= limits.veryNegative) {
+      if (val <= limits.veryNegative) {
         emoji = emojis.emoji1;
-        fillColor = colors.red;
-      } else if (value <= limits.negative) {
+        fill = fillColor || colors.red;
+      } else if (val <= limits.negative) {
         emoji = emojis.emoji2;
-        fillColor = colors.orange;
-      } else if (value < limits.neutral) {
+        fill = fillColor || colors.orange;
+      } else if (val < limits.neutral) {
         emoji = emojis.emoji3;
-        fillColor = colors.white;
-      } else if (value < limits.positive) {
+        fill = fillColor || colors.white;
+      } else if (val < limits.positive) {
         emoji = emojis.emoji4;
-        fillColor = colors.green;
+        fill = fillColor || colors.green;
       } else {
         emoji = emojis.emoji5;
-        fillColor = colors.greenLight;
+        fill = fillColor || colors.greenLight;
       }
 
       return [
@@ -77,13 +82,12 @@ export const EmojiScoreComponent: m.FactoryComponent<EmojiAttrs> = () => {
           "svg.unselectable",
           { width: size, height: size, viewBox: "0 0 1200 1600", style },
           m("path", {
-            fill: fillColor,
+            fill,
             d:
               "M600 30C285.6 30 30 285.6 30 600s255.6 570 570 570 570-255.6 570-570S914.4 30 600 30z" +
               emoji,
           })
         ),
-        // m("span", { }, value.toFixed(1)),
       ];
     },
   };
