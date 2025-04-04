@@ -7,7 +7,7 @@ import { User, UserRole } from "./login-service";
 import { scrollToTop } from "../utils";
 
 // const settingsSvc = restServiceFactory<Settings>('settings');
-const MODEL_KEY = "MITHRIL_APP_MODEL";
+const MODEL_KEY = "COA_COMPASS_MODEL";
 const USER_ROLE = "USER_ROLE";
 export const APP_TITLE = "COA COMPASS";
 export const APP_TITLE_SHORT = "COMPASS";
