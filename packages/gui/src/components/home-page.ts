@@ -12,6 +12,7 @@ import {
 import { ISelectOptions, Select, Tabs } from "mithril-materialized";
 import { Dashboard } from "./ui/dashboard";
 import silenceIcon from "../assets/icons/noun-silence-237457.svg";
+import otherRemarksIcon from "../assets/icons/noun-chat-985169.svg";
 import { interviewQuestionnaire, RespondentType } from "../services/csv/index";
 
 export const Questionnaire: FactoryComponent<{ data: UserEntry[] }> = () => {
@@ -59,6 +60,7 @@ export const Stats: FactoryComponent<{ data: UserEntry }> = () => {
           gender = "",
           age = 0,
           azcMonths = 0,
+          recOther,
         },
       },
     }) => {
@@ -67,35 +69,39 @@ export const Stats: FactoryComponent<{ data: UserEntry }> = () => {
         m(
           "li.tooltip",
           m(
-            "i.material-icons",
-            gender === "Man"
-              ? "man"
-              : gender === "Vrouw"
-              ? "woman"
-              : "question_mark"
-          ),
-          `${age} jaar`,
-          m(
             "span.tooltiptext",
             `Respondent is een ${
               gender ? gender.toLowerCase() : "?"
             } van ${age} jaar.`
+          ),
+          m(
+            "span.item-content",
+            m(
+              "i.material-icons",
+              gender === "Man"
+                ? "man"
+                : gender === "Vrouw"
+                ? "woman"
+                : "question_mark"
+            ),
+            m("span", `${age} jaar`)
           )
         ),
         azcMonths &&
           m(
             "li.tooltip",
-            m("i.material-icons", "house"),
-            `${azcMonths} maanden`,
             m(
               "span.tooltiptext",
               `Respondent woont al ${azcMonths} maanden in een AZC.`
+            ),
+            m(
+              "span.item-content",
+              m("i.material-icons", "house"),
+              `${azcMonths} maanden`
             )
           ),
         m(
           "li.tooltip",
-          m("i.material-icons", "check"),
-          `${Math.round((answeredCnt * 100) / questionCnt)}%`,
           m(
             "span.tooltiptext",
             `Respondent heeft ${
@@ -103,23 +109,46 @@ export const Stats: FactoryComponent<{ data: UserEntry }> = () => {
                 ? "alle"
                 : `${answeredCnt} van de ${questionCnt}`
             } vragen ingevuld.`
+          ),
+          m(
+            "span.item-content",
+            m("i.material-icons", "check"),
+            `${Math.round((answeredCnt * 100) / questionCnt)}%`
           )
         ),
         declinedCnt > 0 &&
           m(
             "li.tooltip",
-            m("img", {
-              width: "20px",
-              height: "20px",
-              alt: 'Aantal vragen beantwoord met "Zeg ik liever niet/"',
-              src: silenceIcon,
-            }),
-            `${declinedCnt === 1 ? "1 vraag" : `${declinedCnt} vragen`}`,
             m(
               "span.tooltiptext",
               `Respondent heeft ${
                 declinedCnt === 1 ? "1 vraag" : `${declinedCnt} vragen`
               } beantwoord met "Zeg ik liever niet".`
+            ),
+            m(
+              "span.item-content",
+              m("img", {
+                width: "20px",
+                height: "20px",
+                alt: 'Aantal vragen beantwoord met "Zeg ik liever niet/"',
+                src: silenceIcon,
+              }),
+              `${declinedCnt === 1 ? "1 vraag" : `${declinedCnt} vragen`}`
+            )
+          ),
+        recOther &&
+          m(
+            "li.tooltip",
+            m("span.tooltiptext", `Bewoner: “${recOther}”.`),
+            m(
+              "span.item-content",
+              m("img", {
+                width: "20px",
+                height: "20px",
+                alt: "Open vraag: Wil je wat kwijt?",
+                src: otherRemarksIcon,
+              }),
+              m("span.truncate", `Bewoner: “${recOther}”.`)
             )
           )
       );

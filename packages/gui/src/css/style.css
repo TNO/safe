@@ -139,7 +139,6 @@ a {
     display: none;
   }
 }
-
 .margin-top7 {
   margin-top: 7px;
 }
@@ -147,9 +146,45 @@ a {
   display: inline-block;
   margin: 0 1rem;
 }
-ul.list-inline li {
-  display: inline;
+
+ul.list-inline {
+  display: flex;
+  flex-wrap: nowrap;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  /* gap: 1rem; */
 }
+
+ul.list-inline li {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0; /* prevent shrinking except last */
+}
+ul.list-inline li.tooltip {
+  position: relative;
+}
+
+ul.list-inline li:last-child {
+  flex-shrink: 1;
+  min-width: 0;
+}
+
+.item-content {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  min-width: 0;
+}
+
+.item-content .truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+  min-width: 0;
+}
+
 ul.menu-buttons > li {
   margin: 5px 0;
 }
@@ -298,25 +333,27 @@ li.collection-item:first-child {
 .tooltip {
   position: relative;
   display: inline-block;
+  cursor: pointer;
   /* border-bottom: 1px dotted black; /* If you want dots under the hoverable text */
 }
 
 /* Tooltip text */
 .tooltip .tooltiptext {
   visibility: hidden;
-  width: 180px;
-  background-color: rgba(0, 0, 0, 0.8);
+  opacity: 0;
+  transition: opacity 0.2s ease-in-out, visibility 0.2s;
+  width: max-content;
+  background-color: #333;
   color: #fff;
   text-align: center;
-  padding: 5px;
+  padding: 5px 8px;
   border-radius: 4px;
   position: absolute;
   z-index: 1;
-  top: 125%; /* Position below the container */
+  top: 150%;
   left: 50%;
   transform: translateX(-50%);
-  opacity: 0;
-  transition: opacity 0.3s;
+  white-space: nowrap;
 }
 
 /* Show the tooltip text when you mouse over the tooltip container */
@@ -324,7 +361,7 @@ li.collection-item:first-child {
   visibility: visible;
   opacity: 1;
 }
-.tooltip-text::after {
+.tooltiptext::after {
   content: "";
   position: absolute;
   bottom: 100%;
@@ -680,6 +717,7 @@ ul.stats {
   border: #000000 1px solid;
   border-radius: 5px;
   padding: 7px;
+  margin-top: 16px;
 }
 ul.stats > li {
   margin-right: 15px;
