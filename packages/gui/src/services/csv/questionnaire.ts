@@ -6,8 +6,8 @@ type UserEntryRecord = {
 
 export const questionnaire: UserEntryRecord = {
   gender: "Geslacht",
-  age: "Hoe oud ben jij?",
-  azcMonths: "Hoeveel maanden woon je al op een AZC opvanglocatie?",
+  age: "Hoe oud bent u?",
+  azcMonths: "Hoeveel maanden woon je al op een azc opvanglocatie?",
   lifeMeaningful: "Ik ervaar mijn leven als zinvol",
   senseOfPurpose: "Ik heb het gevoel dat mijn leven een doel heeft",
   meaningfulActivities:
@@ -21,7 +21,7 @@ export const questionnaire: UserEntryRecord = {
   alcohol:
     "Ik drink alcohol om me beter te voelen als het niet goed met me gaat",
   freqPhysViol:
-    "Hoe vaak gebruik je opzettelijk en direct fysiek geweld tegen andere mensen of voorwerpen?",
+    "Hoe vaak gebruikt u opzettelijk en direct fysiek geweld tegen andere mensen of voorwerpen?",
   selfOccupancy: "Ik kan mezelf bezig houden",
   sufAct: "Er zijn hier genoeg dingen te doen voor mij",
   dailyVariation: "Iedere dag hier is anders",
@@ -67,12 +67,14 @@ export const questionnaire: UserEntryRecord = {
   impulsive: "Mensen beschrijven mij als impulsief",
   angry: "Ik laat me meeslepen door mijn boosheid",
   threatening:
-    "Hoe vaak gebruik je dreigende lichaamstaal of gebaren om anderen te intimideren, bang te maken, te beledigen, uit te sluiten of te negeren?",
+    "Hoe vaak gebruikt u dreigende lichaamstaal of gebaren om anderen te intimideren, bang te maken, te beledigen, uit te sluiten of te negeren?",
   insulting:
-    "Hoe vaak gebruik je opzettelijk beledigende, kleinerende of grove taal om anderen te kwetsen, te intimideren of te vernederen?",
+    "Hoe vaak gebruikt u opzettelijk beledigende, kleinerende of grove taal om anderen te kwetsen, te intimideren of te vernederen?",
   deceptive:
-    "Hoe vaak gebruik je valse informatie, misleiding, manipulatie of emotionele chantage voor persoonlijk gewin of om uw zin te krijgen?",
+    "Hoe vaak gebruikt u valse informatie, misleiding, manipulatie of emotionele chantage voor persoonlijk gewin of om uw zin te krijgen?",
   recHelp: "Heb je hulp gehad bij het invullen van de vragenlijst?",
+  recOther:
+    "Wil je na het invullen van deze vragenlijst nog iets kwijt? Dit kan je hieronder aangeven.",
   informedConsent:
     "Ben jij akkoord dat jouw begeleider de ingevulde vragen kan inzien om jou verder te helpen in de begeleiding?",
   info: "Heb je van tevoren via een brief informatie ontvangen van jouw COA-begeleider over dit onderzoek?",
@@ -81,7 +83,7 @@ export const questionnaire: UserEntryRecord = {
   compentency3:
     "Ik denk dat ik in staat ben om verschillende taken en uitdagingen goed aan te pakken",
   autonomy1: "Ik voel me vrij om mijn mening en ideeën te uiten",
-  autonomy2: "Ik kan mezelf zijn in het AZC",
+  autonomy2: "Ik kan mezelf zijn in het azc",
   autonomy3:
     "Ik heb de mogelijkheid om zelf te bepalen wat ik doe in mijn dagelijks leven",
   physicalViolenceUsed:
@@ -98,7 +100,7 @@ export const interviewQuestionnaire: UserEntryRecord = {
   info: "Heb je van tevoren via een brief informatie ontvangen van jouw COA-begeleider over dit onderzoek?",
   informedConsent:
     "Ben jij akkoord dat jouw begeleider de ingevulde vragen kan inzien om jou verder te helpen in de begeleiding?",
-  uniqueCode: "Welke unieke code heb je ontvangen van jouw begeleider?",
+  uniqueCode: "Naam",
   victimOfViolence:
     "Hoe vaak ben je in het verleden slachtoffer of getuige geweest van geweld?",
   gender: "Geslacht",
@@ -115,9 +117,9 @@ export const interviewQuestionnaire: UserEntryRecord = {
   fairTreatment:
     "Hoe vaak heb je het gevoel dat je eerlijk behandeld wordt in het azc?",
   influence:
-    "Hoe vaak heb je het gevoel dat je mag meedenken over de regels en afspraken in het azc?",
+    "Hoe vaak mag je meedenken over de regels en afspraken in het azc?",
   honestRules: "Hoe vaak vind je de regels in het azc eerlijk?",
-  nicePersonnel: "Hoe vaak kun je goed opschieten met het COA-personeel?",
+  nicePersonnel: "Hoe vaak kun je goed opschieten met het COA-medewerkers?",
   nicePeople: "Hoe vaak kun je goed opschieten met andere bewoners?",
   caringPeople: "Hoe vaak heb je het gevoel dat mensen in het azc om je geven?",
   closeness:
@@ -147,15 +149,15 @@ export const interviewQuestionnaire: UserEntryRecord = {
     "Hoe vaak ben je in staat om nuttige nieuwe vaardigheden aan te leren?",
   compentency2: "Hoe vaak krijg je de kans om je vaardigheden te laten zien?",
   compentency3:
-    "Hoe vaak dank je dat je in staat bent om verschillende taken en uitdagingen goed aan te pakken?",
+    "Hoe vaak denk je dat je in staat bent om verschillende taken en uitdagingen goed aan te pakken?",
   autonomy1: "Hoe vaak voel je je vrij om je mening en ideeën te uiten?",
-  autonomy2: "Hoe vaak kan je jezelf zijn in het AZC?",
+  autonomy2: "Hoe vaak kan je jezelf zijn in het azc?",
   autonomy3:
     "Hoe vaak heb je de mogelijkheid om zelf te bepalen wat je doet in je dagelijks leven?",
-  violenceNeverAcceptable: "Is geweld acceptabel?",
-  violAccept: "Kan het in sommige situaties goed zijn om geweld te gebruiken?",
-  selfDef:
-    "Is het oké om iemand te slaan als diegene jou eerst heeft geslagen?",
+  violenceNeverAcceptable: "Wanneer is geweld acceptabel?",
+  violAccept:
+    "Hoe vaak zijn er situaties waarin het goed is om geweld te gebruiken?",
+  selfDef: "Is het oké om iemand te slaan, als diegene jou als eerste slaat?",
   drugUse:
     "Hoe vaak gebruik je drugs om je beter te voelen als dingen moeilijk zijn?",
   sleepMeds:
@@ -186,10 +188,9 @@ export const interviewQuestionnaire: UserEntryRecord = {
 export const headerMapping: { [key: string]: keyof UserEntry } = {
   "respondent id": "respondentId",
   "start datum": "startDate",
-  "eind datum": "endDate",
   "start tijd": "startTime",
-  "welke unieke code heb je ontvangen van jouw b": "uniqueCode",
   "welke unieke code heb je gegeven aan jouw bew": "uniqueCode",
+  naam: "uniqueCode",
   status: "status",
   geslacht: "gender",
   ...Object.entries(questionnaire).reduce((acc, [key, value]) => {

@@ -191,6 +191,7 @@ export type UserEntry = Partial<UserLikertAnswers> & {
   age?: number | string;
   azcMonths?: number | string;
   informedConsent?: string;
+  recOther?: string;
   uniqueCode?: string | number;
   // [questionId: string]: number | string | undefined; // question IDs will map to numbers
 };
