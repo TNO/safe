@@ -1,4 +1,12 @@
-import { FactorKey } from "./index";
+import { FactorKey, UserEntry, categories } from "./index";
+
+const textForMissingData = {
+  needs: `_De bewoner heeft niet alle vragen van deze factor beantwoord. Je kunt daarom niet zomaar de handelingsrichtlijn gebruiken die hier wordt weergegeven, want je mist informatie. Wat je kunt doen, is het gesprek aangaan over de kenmerken van deze factor. Indien je uit gesprekken met de bewoner merkt dat deze behoefte niet wordt vervuld, kun je er alsnog voor kiezen om dit handelingsperspectief in te zetten. Blijf je er wel van bewust dat de bewoner mogelijk niet over deze behoefte wilt praten en breng de bewoner daarmee niet in verlegenheid._`,
+  personality: `_De bewoner heeft niet alle vragen van deze factor beantwoord en daarom kan je het handelingsperspectief niet zomaar gebruiken. Kijk of je handelingsperspectieven kan inzetten op basis van de scores op behoeften. Je kunt proberen om met de bewoner het gesprek aan te gaan over deze vragen, zodat deze in een volgende fase mogelijk wel worden beantwoord._`,
+  values: `_De bewoner heeft niet alle vragen van deze factor beantwoord en daarom kan je het handelingsperspectief niet zomaar gebruiken. Kijk of je handelingsperspectieven kan inzetten op basis van de scores op behoeften. Je kunt proberen om met de bewoner het gesprek aan te gaan over deze vragen, zodat deze in een volgende fase mogelijk wel worden beantwoord._`,
+  stress: `_De bewoner heeft niet alle vragen van deze factor beantwoord. Je kunt daarom niet zomaar de handelingsrichtlijn gebruiken die hier wordt weergegeven, want je mist informatie. Het kan zijn dat de bewoner niet over dit onderwerp wilt praten en dan is het niet verstandig om daarop aan te dringen. Blijf deze bewoner wel voorspelbaarheid en structuur bieden en geef de bewoner ruimte om naar je toe te komen voor hulp._`,
+  agression: `_De bewoner heeft niet alle vragen over agressie beantwoord. Gebruik daarom de antwoorden van de medewerker over de bewoner._`,
+} as Record<keyof typeof categories, string>;
 
 export const explanations = {
   meaning: {
@@ -19,6 +27,8 @@ export const explanations = {
       expHigh:
         "In vergelijking met andere bewoners scoort deze bewoner hoog op zingeving.\n\nWat je zou kunnen herkennen bij deze bewoner is:\n- dat hij/zij altijd duidelijk weet wat hij/zij wil in het leven;\n- dat de bewoner vaak meedoet aan belangrijke activiteiten en relaties;\n- dat hij/zij veel motivatie heeft en gericht is op doelen;\n- dat de bewoner vertrouwen heeft in wat hij/zij kan en bijdraagt;\n- dat hij/zij een sterk gevoel van eigenwaarde en zelfvertrouwen heeft",
     },
+    questions: ["lifeMeaningful", "senseOfPurpose", "meaningfulActivities"],
+    missingData: textForMissingData.needs,
   },
   honesty: {
     title: "Eerlijkheid",
@@ -38,6 +48,8 @@ export const explanations = {
       expHigh:
         "In vergelijking met andere bewoners wordt de behoefte aan rechtvaardigheid voor deze bewoner voldoende vervuld. \n\nWat je zou kunnen herkennen bij deze bewoner is:\n- dat de bewoner regelmatig aangeeft blij te zijn met de manier waarop hij wordt behandeld. \n- dat hij/zij vaker deelneemt aan groepsactiviteiten en beslissingsprocessen. \n- hij/zij waarschijnlijk vertrouwen laat zien in gesprekken met autoriteiten en andere bewoners. \n- hij/zij anderen ook vaak eerlijk zal behandelen. ",
     },
+    questions: ["fairTreatment", "influence", "honestRules"],
+    missingData: textForMissingData.needs,
   },
   connection: {
     title: "Verbinding",
@@ -57,6 +69,8 @@ export const explanations = {
       expHigh:
         "In vergelijking met andere bewoners is de behoefte aan verbinding voor deze bewoner goed vervuld. \n\nWat je zou kunnen herkennen bij deze bewoner is: \n- hij/zij doet regelmatig mee aan sociale interacties en activiteiten in de gemeenschap. \n- hij/zij vormt en onderhoudt positieve relaties met verschillende medebewoners en medewerkers. \n- de bewoner heeft over het algemeen vertrouwen in anderen en voelt zich op zijn/haar gemak in sociale situaties. \n- hij/zij biedt vaak hulp en steun aan anderen in de gemeenschap.",
     },
+    questions: ["nicePersonnel", "nicePeople", "caringPeople", "closeness"],
+    missingData: textForMissingData.needs,
   },
   appreciation: {
     title: "Waardering",
@@ -76,6 +90,8 @@ export const explanations = {
       expHigh:
         "In vergelijking met andere bewoners is de behoefte aan waardering voor deze bewoner redelijk goed vervuld.\n\nWat je zou kunnen herkennen bij deze bewoner is:\n- dat hij/zij zich meestal gerespecteerd en gehoord voelt door anderen;\n- makkelijk gedachten en ervaringen deelt in de meeste situaties;\n- regelmatig deelneemt aan activiteiten en voelt dat zijn/haar inbreng wordt gewaardeerd;\n- een goed zelfbeeld heeft in de meeste sociale situaties;\n- meestal positief praat over hoe hij/zij in het centrum wordt behandeld.",
     },
+    questions: ["dignity", "supportiveOfNeeds", "heard", "appreciated"],
+    missingData: textForMissingData.needs,
   },
   ptsd: {
     title: "PTSS herbeleving",
@@ -95,6 +111,8 @@ export const explanations = {
       expHigh:
         "In vergelijking met andere bewoners heeft deze bewoner een redelijk hoge score op PTSS herbeleving.\n\nWat je zou kunnen herkennen bij deze bewoner is:\n- dat hij/zij soms afgeleid lijkt of in gedachten verzonken is;\n- dat hij/zij aangeeft af en toe verontrustende herinneringen of dromen te hebben;\n- dat er ongemak zichtbaar kan zijn wanneer trauma- gerelateerde onderwerpen worden besproken",
     },
+    questions: ["upset", "flashbacks", "anxiety"],
+    missingData: textForMissingData.stress,
   },
   victim: {
     title: "Slachtoffer of getuige van geweld",
@@ -102,7 +120,7 @@ export const explanations = {
       actLowScore:
         "Een lage score op slachtofferschap of getuige van geweld betekent dat de bewoner waarschijnlijk geen problemen ervaart die verband houden met geweld. Dit sluit niet uit dat de bewoner last kan hebben van andere mentale klachten. Overleg bij twijfel altijd met collega's of met een gedragswetenschapper.",
       actHighScore:
-        "Een hoge score op 'slachtofferschap of getuige van geweld' vergroot het risico dat iemand zelf dader kan worden van agressie. Indien de bewoner ook hoog scoort op depressie en/of PTSD, raadpleeg dan eerst een gedragswetenschapper, een psycholoog of een POH. In jouw begeleiding is verstandig om de volgende handelingsperspectieven aan te houden:\n- Help de bewoner om situaties of prikkels te herkennen die de bewoner herinneren aan het geweld. Zoek vervolgens samen naar manieren om deze prikkels en situaties zo veel mogelijk te vermijden. \n- Zorg voor een veilige omgeving zonder harde onverwachte geluiden, bewegingen of andere prikkels die de bewoner stress geven. \n- leer de bewoner om zonder geweld conflicten op te lossen. Oefen situaties en gesprekken en begeleid de bewoner tijdens conflict. \n- moedig de bewoner aan om professionele hulp te accepteren, omdat er mogelijk sprake is van trauma",
+        "Een hoge score op 'slachtofferschap of getuige van geweld' vergroot het risico dat iemand zelf dader kan worden van agressie. Indien de bewoner ook hoog scoort op depressie en/of PTSD', 'raadpleeg dan eerst een gedragswetenschapper, een psycholoog of een POH. In jouw begeleiding is verstandig om de volgende handelingsperspectieven aan te houden:\n- Help de bewoner om situaties of prikkels te herkennen die de bewoner herinneren aan het geweld. Zoek vervolgens samen naar manieren om deze prikkels en situaties zo veel mogelijk te vermijden. \n- Zorg voor een veilige omgeving zonder harde onverwachte geluiden, bewegingen of andere prikkels die de bewoner stress geven. \n- leer de bewoner om zonder geweld conflicten op te lossen. Oefen situaties en gesprekken en begeleid de bewoner tijdens conflict. \n- moedig de bewoner aan om professionele hulp te accepteren, omdat er mogelijk sprake is van trauma",
       expAvg:
         "In vergelijking met andere bewoners scoort deze bewoner gemiddeld op ervaringen met geweld.\n\nWat je zou kunnen herkennen bij deze bewoner is:\n- dat hij/zij in nieuwe situaties enigszins op zijn/haar hoede is, maar nog meedoet;\n- dat er soms tekenen van stress zijn als de bewoner aan geweld wordt herinnerd;\n- dat hij/zij meestal over ervaringen kan praten, maar zich soms ongemakkelijk voelt;\n- dat er licht vermijdingsgedrag is bij specifieke prikkels;\n- dat er wat moeite is met vertrouwen, maar dat de bewoner wel relaties kan aangaan;\n- dat er af en toe nachtmerries of slaapproblemen zijn",
       expLowest:
@@ -114,6 +132,8 @@ export const explanations = {
       expHigh:
         "In vergelijking met andere bewoners scoort deze bewoner hoog op ervaringen met geweld.\n\nWat je zou kunnen herkennen bij deze bewoner is:\n- dat hij/zij snel schrikt van onverwachte dingen;\n- dat de bewoner soms afwezig lijkt of verdwaald in gedachten;\n- dat er zichtbaar ongemak of angst is bij het praten over onderwerpen die met geweld te maken hebben;\n- dat de bewoner bepaalde plekken of situaties vermijdt die met eerder gezien geweld te maken hebben;\n- dat er moeite is met concentreren of dat de bewoner afgeleid lijkt tijdens gesprekken;\n- dat er vaker prikkelbaar gedrag of boze uitbarstingen zijn dan bij anderen",
     },
+    questions: ["victimOfViolence"],
+    missingData: textForMissingData.stress,
   },
   kindness: {
     title: "Vriendelijkheid",
@@ -133,6 +153,8 @@ export const explanations = {
       expHigh:
         "In vergelijking met andere bewoners scoort deze bewoner hoog op vriendelijkheid.\n\nWat je zou kunnen herkennen bij deze bewoner is:\n- dat hij/zij meestal vriendelijk en attent is;\n- dat de bewoner vaak vergeeft en begrip toont voor anderen;\n- dat hij/zij luistert naar de ideeën van anderen;\n- dat de bewoner ruzies vermijdt, maar kan meedoen als het nodig is;\n- dat hij/zij rekening houdt met de behoeften van anderen;\n- dat de bewoner goed samenwerkt in groepen",
     },
+    questions: ["rude", "forgiving", "kind"],
+    missingData: textForMissingData.personality,
   },
   depression: {
     title: "Neerslachtigheid",
@@ -152,6 +174,15 @@ export const explanations = {
       expHigh:
         "In vergselijking met andere bewoners scoort deze bewoner hoog op somberheid.\n\nWat je zou kunnen herkennen bij deze bewoner is:\n- dat hij/zij vaak verdrietig uitziet of weinig energie heeft;\n- dat hij/zij regelmatig slaapproblemen heeft;\n- dat hij/zij zelden plezier lijkt te hebben in activiteiten;\n- dat het merkbaar moeilijk is om zich op taken te concentreren;\n- dat sociale uitnodigingen of groepsactiviteiten vaak worden afgeslagen",
     },
+    questions: [
+      "down,",
+      "sleepDifficulty",
+      "irritated",
+      "niceActivities",
+      "concentration",
+      "avoidContact",
+    ],
+    missingData: textForMissingData.stress,
   },
   agressionResidentsView: {
     title: "Agressie (bewoner)",
@@ -181,6 +212,8 @@ export const explanations = {
       expHigh:
         'Voorbeelden van niet-fysieke agressie zijn schreeuwen, vloeken of schelden (verbale agressie), mensen uitschelden of denigrerende taal gebruiken, en bedreigingen uiten om anderen te intimideren. Ook het verspreiden van roddels, iemand buitensluiten uit sociale groepen, het opzettelijk negeren van iemand (de "silent treatment"), en online bedreigende berichten sturen (cyberpesten) vallen hieronder. Verder maakt de bewoner vaak sarcastische of kleinerende opmerkingen, schaadt opzettelijk iemands reputatie en manipuleert relaties om iemand te isoleren.',
     },
+    questions: ["freqPhysViol", "threatening", "insulting", "deceptive"],
+    missingData: textForMissingData.agression,
   },
   agressionStaffsView: {
     title: "Agressie (medewerker)",
@@ -210,6 +243,13 @@ export const explanations = {
       expHigh:
         'Voorbeelden van niet-fysieke agressie zijn schreeuwen, vloeken of schelden (verbale agressie), mensen uitschelden of denigrerende taal gebruiken, en bedreigingen uiten om anderen te intimideren. Ook het verspreiden van roddels, iemand buitensluiten uit sociale groepen, het opzettelijk negeren van iemand (de "silent treatment"), en online bedreigende berichten sturen (cyberpesten) vallen hieronder. Verder maakt de bewoner vaak sarcastische of kleinerende opmerkingen, schaadt opzettelijk iemands reputatie en manipuleert relaties om iemand te isoleren.',
     },
+    questions: [
+      "physicalViolenceUsed",
+      "freqThreatBL",
+      "freqInsults",
+      "freqDecept",
+    ],
+    missingData: textForMissingData.agression,
   },
 } as Record<
   FactorKey,
@@ -217,6 +257,8 @@ export const explanations = {
     title: string;
     physical: FactorExplanation;
     nonPhysical?: FactorExplanation;
+    questions: Array<keyof UserEntry>;
+    missingData: string;
   }
 >;
 

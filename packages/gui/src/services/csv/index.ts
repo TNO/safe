@@ -22,7 +22,7 @@ import {
 
 export type LikertScale = 0 | 1 | 2 | 3 | 4 | 5;
 
-const categories = {
+export const categories = {
   /** zingeving, variatie, eerlijkheid, verbinding, waardering, autonomie, competenties */
   needs: "Psychologische behoeften",
   /** vermijdende coping, dwingende stijl, vriendelijkheid, zelfcontrole, vijandigheidsbias (hostility bias) */
@@ -181,7 +181,6 @@ export type UserEntry = Partial<UserLikertAnswers> & {
   answeredCnt?: number;
   /** Number of questions that were answered with "Zeg ik liever niet" */
   declinedCnt?: number;
-  endDate?: string;
   status?: string;
   gender?: string;
   /** Did you receive help while filling out the questionnaire */
@@ -255,6 +254,10 @@ export type Factor = {
   score: LikertScore;
   /** If true (default), a positive score indicates a happy smiley */
   moreIsBetter?: boolean;
+  /** The question keys that are used to generate the factor */
+  questions: string[];
+  /** The message that should be displayed when not all questions are answered */
+  missingData: string;
 };
 
 export type LikertScore = [
@@ -392,14 +395,20 @@ const getColorForValue = (
   }
 };
 
-const paTitle = "#### Fysieke agressie\n\n";
-const npaTitle = "#### Niet-fysieke agressie\n\n";
+const paTitle = ""; // "#### Fysieke agressie\n\n";
+const npaTitle = ""; // "#### Niet-fysieke agressie\n\n";
 
 const addTitleAndDescToFactor = (factor: Factor): Factor => {
   const { key, score } = factor;
   const [physAgres, nonPhysAgres] = score;
   const explanation = explanations[key];
-  const { title, physical: explP, nonPhysical: explNP = explP } = explanation;
+  const {
+    title,
+    physical: explP,
+    nonPhysical: explNP = explP,
+    questions,
+    missingData,
+  } = explanation;
   let descPA: string;
   let descNPA: string;
   let actPA: string;
@@ -539,6 +548,8 @@ const addTitleAndDescToFactor = (factor: Factor): Factor => {
     moreIsBetter,
     score,
     title,
+    questions,
+    missingData,
     desc:
       descPA === descNPA || !descNPA
         ? [descPA, ""]
@@ -595,27 +606,27 @@ export const userEntryToScore = (entry: UserEntry): UserScore => {
     // drugUseForMood = 0,
     // sleepOrMedicationForMood = 0,
     // alcoholUseForMood = 0,
-    freqPhysViol: frequencyOfPhysicalViolence = 0,
+    freqPhysViol = 0,
     // selfOccupancy = 0,
     // sufficientActivities = 0,
     // dailyVariation = 0,
-    fairTreatment: fairTreatmentInAzc = 0,
-    influence: influenceOnRulesAndAppointments = 0,
+    fairTreatment = 0,
+    influence = 0,
     // coerceOthers = 0,
     // rigidWaysOfDoingThings = 0,
     // ordersOthersToFollowMe = 0,
-    rude: rudeTowardsOthers = 0,
-    forgiving: capacityForForgiveness = 0,
-    kind: attentiveAndKind = 0,
+    rude = 0,
+    forgiving = 0,
+    kind = 0,
     // controlOverAnger = 0,
     // perceivedAsImpulsive = 0, // Negative trait
     // dominatedByAnger = 0, // Negative trait
-    threatening: threateningBodyLanguage = 0,
-    insulting: insultingLanguage = 0,
-    deceptive: deceptionForPersonalGain = 0,
-    freqThreatBL: frequencyOfThreateningBodyLanguage = 0,
-    freqInsults: frequencyOfInsultingLanguage = 0,
-    freqDecept: frequencyOfDeceptionForPersonalGain = 0,
+    threatening = 0,
+    insulting = 0,
+    deceptive = 0,
+    freqThreatBL = 0,
+    freqInsults = 0,
+    freqDecept = 0,
   } = entry;
 
   const avgSignificance = avg(
@@ -623,11 +634,7 @@ export const userEntryToScore = (entry: UserEntry): UserScore => {
     senseOfPurpose,
     meaningfulActivities
   );
-  const avgFairness = avg(
-    fairTreatmentInAzc,
-    influenceOnRulesAndAppointments,
-    honestRules
-  );
+  const avgFairness = avg(fairTreatment, influence, honestRules);
   const avgRelatedness = avg(
     nicePersonnel,
     nicePeople,
@@ -645,31 +652,12 @@ export const userEntryToScore = (entry: UserEntry): UserScore => {
     avoidContact
   );
   const avgVictim = avg(victimOfViolence);
-  const avgKindness = avg(
-    invertAnswer(rudeTowardsOthers),
-    capacityForForgiveness,
-    attentiveAndKind
-  );
-  // TODO REMOVE
-  console.table({
-    avgKindness,
-    rudeTowardsOthers,
-    capacityForForgiveness,
-    attentiveAndKind,
-  });
+  const avgKindness = avg(invertAnswer(rude), forgiving, kind);
 
-  const avgPhysAgressResidentsView = avg(frequencyOfPhysicalViolence);
-  const avgNonPhysAgressResidentsView = avg(
-    threateningBodyLanguage,
-    insultingLanguage,
-    deceptionForPersonalGain
-  );
+  const avgPhysAgressResidentsView = avg(freqPhysViol);
+  const avgNonPhysAgressResidentsView = avg(threatening, insulting, deceptive);
   const avgPhysAgressStaffsView = avg(physicalViolenceUsed);
-  const avgNonPhysAgressStaffsView = avg(
-    frequencyOfThreateningBodyLanguage,
-    frequencyOfInsultingLanguage,
-    frequencyOfDeceptionForPersonalGain
-  );
+  const avgNonPhysAgressStaffsView = avg(freqThreatBL, freqInsults, freqDecept);
 
   const agressionResidentsView = addTitleAndDescToFactor({
     key: "agressionResidentsView",
@@ -815,7 +803,7 @@ const scaleToAnswerText = Object.entries(answerScale).reduce((acc, [s, n]) => {
 
 export const likertToText = (scale: LikertScale) => {
   const found = scaleToAnswerText.get(scale);
-  console.log(scale, found);
+  // console.log(scale, found);
   return found ? found : "-";
 };
 
@@ -928,12 +916,24 @@ const mergeEntries = (
   if (existingEntryIndex !== -1) {
     // Merge the new entry with the existing one
     const existingEntry = entries[existingEntryIndex];
+    if (
+      existingEntry.respondentType === RespondentType.INTERVIEWER &&
+      newEntry.respondentType === RespondentType.USER
+    ) {
+      // Ignore a user entry if the user did not finish his questionnaire and later did an interview.
+      console.log("Ignoring user entry because it was not finished");
+      console.log("Existing entry:", existingEntry);
+      console.log("New entry:", newEntry);
+      return entries;
+    }
+    // If the respondents are the same, merge the entries
     const date = Math.max(existingEntry.date!, newEntry.date!);
     const respondentType = Math.min(
       existingEntry.respondentType || 1,
       newEntry.respondentType || 1
     );
     const mergedEntry = {
+      ...newEntry,
       ...existingEntry,
       ...newEntry,
       date,

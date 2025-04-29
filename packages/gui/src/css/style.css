@@ -350,7 +350,7 @@ li.collection-item:first-child {
   border-radius: 4px;
   position: absolute;
   z-index: 1;
-  top: 150%;
+  top: 125%;
   left: 50%;
   transform: translateX(-50%);
   white-space: nowrap;
@@ -503,7 +503,7 @@ img.thumbnail {
   margin-bottom: 0;
 }
 .page {
-  min-height: 95vh;
+  /* min-height: 95vh; */
   padding-bottom: 20px;
 }
 label,

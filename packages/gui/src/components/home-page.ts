@@ -15,35 +15,46 @@ import silenceIcon from "../assets/icons/noun-silence-237457.svg";
 import otherRemarksIcon from "../assets/icons/noun-chat-985169.svg";
 import { interviewQuestionnaire, RespondentType } from "../services/csv/index";
 
-export const Questionnaire: FactoryComponent<{ data: UserEntry[] }> = () => {
+export const Questionnaire: FactoryComponent<{
+  data: UserEntry[];
+  hideMissingQuestions?: boolean;
+}> = () => {
   return {
-    view: ({ attrs: { data = [] } }) => {
+    view: ({ attrs: { data = [], hideMissingQuestions = false } }) => {
       if (data.length === 0) return;
       return m(
         "table",
         m(
           "tr",
           m("th", `Vraag`),
-          data.map((d) => m("th", `${d.endDate || d.startDate} (${d.status})`))
+          data.map((d) =>
+            m("th", `${d.startDate}${d.status ? ` (${d.status})` : ""}`)
+          )
         ),
         Object.entries(
           data[0].respondentType === RespondentType.INTERVIEWER
             ? interviewQuestionnaire
             : questionnaire
-        ).map(([key, question]) =>
-          m(
-            "tr",
-            m("td", question),
-            data.map((d) =>
-              m(
-                "td",
-                likertScaleProp.includes(key)
-                  ? likertToText(d[key as keyof UserEntry] as LikertScale)
-                  : d[key as keyof UserEntry] ?? ""
+        )
+          .filter(
+            ([key]) =>
+              !hideMissingQuestions ||
+              typeof data[0][key as keyof UserEntry] !== "undefined"
+          )
+          .map(([key, question]) =>
+            m(
+              "tr",
+              m("td", question),
+              data.map((d) =>
+                m(
+                  "td",
+                  likertScaleProp.includes(key)
+                    ? likertToText(d[key as keyof UserEntry] as LikertScale)
+                    : d[key as keyof UserEntry] ?? ""
+                )
               )
             )
           )
-        )
       );
     },
   };

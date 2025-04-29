@@ -240,21 +240,6 @@ export const SideNav: MeiosisComponent = () => {
           //   })
           // ),
         ]
-        // m(ModalPanel, {
-        //   id: 'clear_model',
-        //   title: t('DELETE_ITEM', 'TITLE', { item: t('MODEL') }),
-        //   description: t('DELETE_ITEM', 'DESCRIPTION', { item: t('MODEL').toLowerCase() }),
-        //   buttons: [
-        //     { label: t('CANCEL'), iconName: 'cancel' },
-        //     {
-        //       label: t('DELETE'),
-        //       iconName: 'delete',
-        //       onclick: () => {
-        //         handleSelection('clear', model, saveModel);
-        //       },
-        //     },
-        //   ],
-        // })
       );
     },
   };
@@ -291,6 +276,12 @@ export const SideNavTrigger: MeiosisComponent<{}> = () => {
               iconName: "delete",
               onclick: () => {
                 saveModel(EmptyDataModel());
+                const uriModel = getQueryParameter();
+                if (uriModel) {
+                  window.location.href = `${
+                    window.location.pathname
+                  }?${decodeURIComponent(uriModel)}`;
+                }
               },
             },
           ],
