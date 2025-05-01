@@ -29,8 +29,8 @@
     "translate.js": "^1.3.2"
   },
   "devDependencies": {
-    "@rspack/cli": "^1.3.7",
-    "@rspack/core": "^1.3.7",
+    "@rspack/cli": "^1.3.8",
+    "@rspack/core": "^1.3.8",
     "@types/materialize-css": "^1.0.14",
     "@types/mithril": "^2.2.7",
     "@types/papaparse": "^5.3.15",
