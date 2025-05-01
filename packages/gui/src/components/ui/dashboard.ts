@@ -1,12 +1,12 @@
 import m, { FactoryComponent } from "mithril";
-import { UserEntry, userEntryToScore } from "../../services";
+import { categories, UserEntry, userEntryToScore } from "../../services";
 import { Collapsible, InputCheckbox } from "mithril-materialized";
 import { EmojiScoreComponent } from "../ui/emoji";
 import { SlimdownView } from "mithril-ui-form";
 import physAgres from "../../assets/icons/noun-punch-3883530.svg";
 import bodyLang from "../../assets/icons/noun-verbal-bullying-7108758.svg";
+import lowHangingFruit from "../../assets/icons/low-hanging-fruit-colored.svg";
 import { Questionnaire } from "../home-page";
-import { meiosisSetup } from "meiosis-setup";
 
 type AgressionAttr = {
   score: number;
@@ -129,15 +129,15 @@ export const Dashboard: FactoryComponent<{
           } = s;
           acc.push(
             ...[
+              meaning,
+              honesty,
+              connection,
+              appreciation,
               agressionStaffsView,
               agressionResidentsView,
               ptsd,
               victim,
               depression,
-              meaning,
-              honesty,
-              connection,
-              appreciation,
               kindness,
             ].map(({ svg, score, ...params }) => ({
               ...params,
@@ -269,11 +269,29 @@ export const Dashboard: FactoryComponent<{
                                 "warning"
                               )
                             ),
-                          m("img.unselectable", {
-                            style:
-                              "display: block; width: 90px; height: 90px; vertical-align: middle;",
-                            src: svgIcon,
-                          }),
+                          m(
+                            "ul.list-inline",
+                            m(
+                              "li",
+                              m("img.unselectable", {
+                                style:
+                                  "display: block; width: 90px; height: 90px; vertical-align: middle;",
+                                src: svgIcon,
+                              })
+                            ),
+                            category === categories.needs &&
+                              m(
+                                "li",
+                                m(
+                                  ".flex-item",
+                                  m("img.unselectable", {
+                                    style:
+                                      "display: block; width: 90px; height: 90px; vertical-align: middle;",
+                                    src: lowHangingFruit,
+                                  })
+                                )
+                              )
+                          ),
                           category &&
                             m(
                               "span",
