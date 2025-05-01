@@ -51,9 +51,15 @@ export const PhysicalAgression: FactoryComponent<AgressionAttr> = () => {
         }),
         m(
           "span.tooltiptext",
-          `Fysieke agressie ${
-            showScore ? `(${moreIsBetter ? "" : "-"}${score.toFixed(1)})` : ""
-          }`
+          m.trust(
+            `Fysieke agressie${
+              showScore
+                ? `<br>(-5 < ${moreIsBetter ? "" : "-"}${score.toFixed(
+                    1
+                  )} < +5)`
+                : ""
+            }`
+          )
         )
       );
     },
@@ -96,9 +102,15 @@ export const NonPhysicalAgression: FactoryComponent<AgressionAttr> = () => {
         }),
         m(
           "span.tooltiptext",
-          `Niet-fysieke agressie ${
-            showScore ? `(${moreIsBetter ? "" : "-"}${score.toFixed(1)})` : ""
-          }`
+          m.trust(
+            `Niet-fysieke agressie${
+              showScore
+                ? `<br>(-5 < ${moreIsBetter ? "" : "-"}${score.toFixed(
+                    1
+                  )} < +5)`
+                : ""
+            }`
+          )
         )
       );
     },
