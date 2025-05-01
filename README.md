@@ -1,4 +1,4 @@
-# COA COMPASS
+# COA SAFE (Samen Agressie en Frustratie Evalueren)
 
 A simple dashboard application that loads a CSV with questionnaire data and evaluates the questions.
 
