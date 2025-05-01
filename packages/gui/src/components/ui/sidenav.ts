@@ -111,7 +111,7 @@ export const SideNav: MeiosisComponent = () => {
           );
 
         dlAnchorElem.href = dataStr; // Use href property instead of setAttribute
-        dlAnchorElem.download = `COA_COMPASS_samengevoegd.csv`; // Use download property instead of setAttribute
+        dlAnchorElem.download = `SAFE_samengevoegd.csv`; // Use download property instead of setAttribute
         dlAnchorElem.target = "_blank"; // Use target property instead of setAttribute
 
         document.body.appendChild(dlAnchorElem); // Append to the document so the click works

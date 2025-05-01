@@ -14,10 +14,10 @@ const devMode = (process.env as any).NODE_ENV === "development";
 const isProduction = !devMode;
 const outputPath = resolve(process.cwd(), isProduction ? "../../docs" : "dist");
 const SERVER = process.env.SERVER || "localhost";
-const publicPath = isProduction ? "https://tno.github.io/COMPASS/" : "";
-const APP_TITLE = "COA COMPASS";
+const publicPath = isProduction ? "https://tno.github.io/safe/" : "";
+const APP_TITLE = "SAFE";
 const APP_DESC =
-  "Tool voor de evaluatie van het gedrag van bewoners van COA centra";
+  "Samen Agressie en Frustratie Evalueren - Tool voor de evaluatie van het gedrag van bewoners van COA centra";
 const APP_PORT = 4849;
 
 console.log(
@@ -57,7 +57,7 @@ const configuration: Configuration = {
         "og:url": SERVER || "",
         "og:site_name": APP_TITLE,
         "og:image:alt": APP_TITLE,
-        "og:image": "https://tno.github.io/COMPASS/assets/logo.svg",
+        "og:image": "https://tno.github.io/safe/assets/logo.svg",
         "og:image:type": "image/svg",
         "og:image:width": "200",
         "og:image:height": "200",
