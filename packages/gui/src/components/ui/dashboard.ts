@@ -177,7 +177,7 @@ export const Dashboard: FactoryComponent<{
       );
 
       // TODO Remove in production
-      const showScore = true; //true;
+      const showScore = false; //true;
 
       return (
         scoreItems.length > 0 &&
