@@ -6,6 +6,7 @@ import {
   HtmlRspackPlugin,
   SwcJsMinimizerRspackPlugin,
   LightningCssMinimizerRspackPlugin,
+  SourceMapDevToolPlugin,
 } from "@rspack/core";
 
 config();
@@ -38,7 +39,12 @@ const configuration: Configuration = {
   devServer: {
     port: APP_PORT,
   },
+  devtool: devMode ? "inline-source-map" : "source-map",
   plugins: [
+    new SourceMapDevToolPlugin({
+      test: /\.ts$/,
+      filename: "[file].map[query]",
+    }),
     new DefinePlugin({
       "process.env.SERVER": isProduction
         ? `'${publicPath}'`
@@ -88,7 +94,6 @@ const configuration: Configuration = {
         exclude: [/node_modules/],
         loader: "builtin:swc-loader",
         options: {
-          sourceMap: true,
           jsc: {
             parser: {
               syntax: "typescript",
