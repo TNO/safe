@@ -8,7 +8,7 @@ import { scrollToTop } from "../utils";
 
 // const settingsSvc = restServiceFactory<Settings>('settings');
 const MODEL_KEY = "COA_SAFE_MODEL";
-const USER_ROLE = "USER_ROLE";
+const USER_ROLE = "COA_USER_ROLE";
 export const APP_TITLE = "SAFE";
 export const APP_TITLE_SHORT = "SAFE";
 
