@@ -245,7 +245,7 @@ export const HomePage: MeiosisComponent = () => {
                   : m(
                       ".col.s12.center.bold-text.large",
                       { style: { margin: "20% 0", fontSize: "3em" } },
-                      "Selecteer een unieke gebruikerscode om de dashboard en vragenlijst te bekijken."
+                      "Selecteer een unieke gebruikerscode om het dashboard en de vragenlijst te bekijken."
                     ),
               ]
         ),
