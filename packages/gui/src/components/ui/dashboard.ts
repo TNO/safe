@@ -2,11 +2,11 @@ import m, { FactoryComponent } from "mithril";
 import { categories, UserEntry, userEntryToScore } from "../../services";
 import { Collapsible, InputCheckbox } from "mithril-materialized";
 import { EmojiScoreComponent } from "../ui/emoji";
-import { SlimdownView } from "mithril-ui-form";
 import physAgres from "../../assets/icons/noun-punch-3883530.svg";
 import bodyLang from "../../assets/icons/noun-verbal-bullying-7108758.svg";
 import lowHangingFruit from "../../assets/icons/low-hanging-fruit-colored.svg";
-import { Questionnaire } from "../home-page";
+import { Feedback } from "./feedback";
+import { TabPills } from "./tab-pills";
 
 type AgressionAttr = {
   score: number;
@@ -317,7 +317,22 @@ export const Dashboard: FactoryComponent<{
                             )
                         ),
 
-                        isPhysical
+                        category === categories.agression
+                          ? [
+                              m(PhysicalAgression, {
+                                score: score1,
+                                moreIsBetter,
+                                showScore,
+                                fillColor: colors ? colors[0] : undefined,
+                              }),
+                              m(NonPhysicalAgression, {
+                                score: score2,
+                                moreIsBetter,
+                                showScore,
+                                fillColor: colors ? colors[1] : undefined,
+                              }),
+                            ]
+                          : isPhysical
                           ? m(PhysicalAgression, {
                               score: score1,
                               moreIsBetter,
@@ -332,32 +347,57 @@ export const Dashboard: FactoryComponent<{
                             }),
                       ],
                     ]),
-                    body: m(
-                      ".row",
-                      notAnsweredPerc !== 0 &&
-                        m(".col.s12", m(SlimdownView, { md: missingData })),
-                      m(
-                        ".col.s12.m6",
-                        explanation &&
-                          m(SlimdownView, {
-                            md: "### Wat betekent dit?\n\n" + explanation,
-                          })
-                      ),
-                      m(
-                        ".col.s12.m6",
-                        activityDesc &&
-                          m(SlimdownView, {
-                            md: "### Wat kan ik doen?\n\n" + activityDesc,
-                          })
-                      ),
-                      m(
-                        ".col.s12",
-                        m(Questionnaire, {
-                          data: partialData,
-                          hideMissingQuestions: true,
-                        })
-                      )
-                    ),
+                    body:
+                      category === categories.agression
+                        ? m("div", [
+                            m(TabPills, {
+                              tabs: [
+                                {
+                                  title: [
+                                    m("img.unselectable", {
+                                      src: physAgres,
+                                      alt: "Fysieke agressie",
+                                      width: 48,
+                                      height: 48,
+                                    }),
+                                    "Fysieke agressie",
+                                  ],
+                                  content: m(Feedback, {
+                                    notAnsweredPerc,
+                                    missingData,
+                                    explanation: desc ? desc[0] : "",
+                                    activityDesc: activity ? activity[0] : "",
+                                    partialData,
+                                  }),
+                                },
+                                {
+                                  title: [
+                                    m("img", {
+                                      src: bodyLang,
+                                      alt: "Niet fysieke agressie",
+                                      width: 48,
+                                      height: 48,
+                                    }),
+                                    "Niet-fysieke agressie",
+                                  ],
+                                  content: m(Feedback, {
+                                    notAnsweredPerc,
+                                    missingData,
+                                    explanation: desc ? desc[1] : "",
+                                    activityDesc: activity ? activity[1] : "",
+                                    partialData,
+                                  }),
+                                },
+                              ],
+                            }),
+                          ])
+                        : m(Feedback, {
+                            notAnsweredPerc,
+                            missingData,
+                            explanation,
+                            activityDesc,
+                            partialData,
+                          }),
                   };
                 }
               ),
